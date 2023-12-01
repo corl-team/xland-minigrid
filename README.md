@@ -266,6 +266,13 @@ Let's build together!
 
 ## Citation 🙏
 
-```commandline
-TODO
+```bibtex
+@inproceedings{
+    nikulin2023xlandminigrid,
+    title={{XL}and-MiniGrid: Scalable Meta-Reinforcement Learning Environments in {JAX}},
+    author={Alexander Nikulin and Vladislav Kurenkov and Ilya Zisman and Viacheslav Sinii and Artem Agarkov and Sergey Kolesnikov},
+    booktitle={Intrinsically-Motivated and Open-Ended Learning Workshop, NeurIPS2023},
+    year={2023},
+    url={https://openreview.net/forum?id=xALDC4aHGz}
+}
 ```
