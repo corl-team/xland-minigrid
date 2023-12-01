@@ -1,6 +1,5 @@
 [project]
 name = "xminigrid"
-version = "0.0.1"
 description = "JAX-accelerated meta-reinforcement learning environments inspired by XLand and MiniGrid"
 readme = "README.md"
 requires-python =">=3.8"
@@ -8,6 +7,8 @@ license = {file = "LICENSE"}
 authors = [
   {name = "Alexander Nikulin", email = "a.p.nikulin@tinkoff.ai"},
 ]
+dynamic = ["version"]
+
 keywords = [
     "jax",
     "neural-networks",
@@ -56,6 +57,9 @@ baselines = [
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+version = {attr = "xminigrid.__version__"}
 
 [tool.ruff]
 line-length = 120
