@@ -1,0 +1,81 @@
+[project]
+name = "xminigrid"
+version = "0.0.1"
+description = "JAX-accelerated meta-reinforcement learning environments inspired by XLand and MiniGrid"
+readme = "README.md"
+requires-python =">=3.8"
+license = {file = "LICENSE"}
+authors = [
+  {name = "Alexander Nikulin", email = "a.p.nikulin@tinkoff.ai"},
+]
+keywords = [
+    "jax",
+    "neural-networks",
+    "deep-learning",
+    "reinforcement learning",
+    "meta reinforcement learning",
+    "gridworld",
+    "minigrid",
+    "xland",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "License :: OSI Approved :: Apache Software License",
+]
+
+dependencies = [
+    "jax>=0.4.13",
+    "jaxlib>=0.4.13",
+    "flax>=0.7.0",
+    "rich>=13.4.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff==0.1.6",
+    "pre-commit==3.3.3"
+]
+
+baselines = [
+    "matplotlib",
+    "imageio",
+    "wandb",
+    "pyrallis",
+    "distrax",
+    "optax",
+    "tensorboard",
+    "orbax"
+]
+
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+# disabling rules conflicting with the formatter (from the docs)
+select = ["E", "F", "I001", "RUF100"]
+# TODO: remove F401 from ignored later
+ignore = [
+    "W191", "E111", "E114",
+    "E117", "D206", "D300",
+    "Q000", "Q001", "Q002",
+    "Q003", "COM812", "COM819",
+    "ISC001", "ISC002", "F401"
+]
+
+[tool.ruff.format]
+skip-magic-trailing-comma = false
+
+[tool.ruff.isort]
+# see https://github.com/astral-sh/ruff/issues/8571
+known-third-party = ["wandb"]
