@@ -151,7 +151,7 @@ class XLandMiniGrid(Environment):
 
     def _generate_problem(self, params: XLandMiniGridEnvOptions, key: jax.Array) -> State:
         # WARN: we can make this compatible with jit (to vmap on different layouts during training),
-        # but it will be very costly, as lax.switch will generate all layouts during reset under vmap
+        # but it will probably be very costly, as lax.switch will generate all layouts during reset under vmap
         # TODO: experiment with this under jit, does it possible to make it jit-compatible without overhead?
         if params.grid_type == "R1":
             key, grid = generate_room(key, params.height, params.width)

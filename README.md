@@ -176,6 +176,8 @@ python scripts/ruleset_generator.py --help
 
 In depth description of all available benchmarks is provided [here (soon)]().
 
+**P.S.** Currently only one benchmark is available. We will release more after some testing and configs balancing. Stay tuned!
+
 ## Environments 🌍
 
 We provide environments from two domains. `XLand` is our main focus for meta-learning. For this domain we provide single
