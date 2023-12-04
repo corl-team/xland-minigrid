@@ -68,8 +68,6 @@ class Environment:
         truncated = jnp.equal(new_state.step_num, self.time_limit(params))
 
         reward = jax.lax.select(terminated, 1.0 - 0.9 * (new_state.step_num / self.time_limit(params)), 0.0)
-        # testing
-        reward = reward - 0.0001
 
         step_type = jax.lax.select(terminated | truncated, StepType.LAST, StepType.MID)
         discount = jax.lax.select(terminated, jnp.asarray(0.0), jnp.asarray(1.0))
