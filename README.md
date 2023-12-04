@@ -51,11 +51,11 @@ TODO: update this with the latest version of the codebase...
 
 > ⚠️ XLand-MiniGrid is currently in alpha stage, so expect breaking changes! ⚠️
 
-> ⚠️ Registration is temporarily disabled on PyPI. We will upload as soon as possible after the unfreeze. ⚠️
-
-The latest release of XLand-MiniGrid can be installed directly from PyPI (soon):
+The latest release of XLand-MiniGrid can be installed directly from PyPI:
 
 ```commandline
+pip install xminigrid
+# or, from github directly
 pip install "xminigrid @ git+https://github.com/corl-team/xland-minigrid.git"
 ```
 
