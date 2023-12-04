@@ -36,10 +36,9 @@ def main():
     apply_fn, reset_fn, step_fn = jax.jit(model.apply), jax.jit(env.reset), jax.jit(env.step)
 
     # initial inputs
-    hidden = model.initialize_carry(1)
     prev_reward = jnp.asarray(0)
-    prev_action = jnp.asarray(0, dtype=jnp.uint32)
-    obs = jnp.zeros(env.observation_shape(env_params))
+    prev_action = jnp.asarray(0)
+    hidden = model.initialize_carry(1)
 
     # for logging
     total_reward, num_episodes = 0, 0
@@ -55,7 +54,7 @@ def main():
         dist, value, hidden = apply_fn(
             params,
             {
-                "observation": obs[None, None, ...],
+                "observation": timestep.observation[None, None, ...],
                 "prev_action": prev_action[None, None, ...],
                 "prev_reward": prev_reward[None, None, ...],
             },
@@ -66,17 +65,16 @@ def main():
         timestep = step_fn(env_params, timestep, action)
         prev_action = action
         prev_reward = timestep.reward
-        obs = timestep.observation
 
         total_reward += timestep.reward.item()
         num_episodes += int(timestep.last().item())
-        # if not bool(timestep.last().item()):
+
         rendered_imgs.append(env.render(env_params, timestep))
 
     print("Total reward:", total_reward)
     print_ruleset(ruleset)
-    # imageio.mimsave("rollout_1.mp4", rendered_imgs, fps=8, format="mp4")
-    imageio.mimsave("rollout.gif", rendered_imgs, duration=1000 * 1 / 8, format="gif")
+    imageio.mimsave("rollout.mp4", rendered_imgs, fps=8, format="mp4")
+    # imageio.mimsave("rollout.gif", rendered_imgs, duration=1000 * 1 / 8, format="gif")
 
 
 if __name__ == "__main__":

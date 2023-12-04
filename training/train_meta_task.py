@@ -33,8 +33,8 @@ jax.config.update("jax_threefry_partitionable", True)
 class TrainConfig:
     project: str = "xminigrid"
     group: str = "default"
-    name: str = "meta_task_ppo_pmap"
-    env_id: str = "MiniGrid-Empty-6x6"
+    name: str = "meta_task_ppo"
+    env_id: str = "XLand-Minigrid-R1-8x8"
     benchmark_id: str = "Trivial"
     # agent
     action_emb_dim: int = 16
@@ -42,17 +42,17 @@ class TrainConfig:
     rnn_num_layers: int = 1
     head_hidden_dim: int = 64
     # training
-    num_envs: int = 4096
+    num_envs: int = 8192
     num_steps_per_env: int = 4096
     num_steps_per_update: int = 32
     update_epochs: int = 4
     num_minibatches: int = 16
     total_timesteps: int = 100_000_000
-    lr: float = 0.001  # 2.5e-4
+    lr: float = 0.001
     clip_eps: float = 0.2
     gamma: float = 0.99
     gae_lambda: float = 0.95
-    ent_coef: float = 0.01  # 0.001
+    ent_coef: float = 0.01
     vf_coef: float = 0.5
     max_grad_norm: float = 0.5
     eval_num_envs: int = 512
@@ -60,7 +60,6 @@ class TrainConfig:
     eval_seed: int = 42
     train_seed: int = 42
     checkpoint_path: Optional[str] = None
-    debug: bool = False
 
     def __post_init__(self):
         num_devices = jax.local_device_count()
@@ -327,13 +326,13 @@ def train(config: TrainConfig):
     train_fn = make_train(env, env_params, benchmark, config)
     train_fn = train_fn.lower(rng, train_state, init_hstate).compile()
     elapsed_time = time.time() - t
-    print(f"Done in {elapsed_time:.2f}.")
+    print(f"Done in {elapsed_time:.2f}s.")
 
     print("Training...")
     t = time.time()
     train_info = jax.block_until_ready(train_fn(rng, train_state, init_hstate))
     elapsed_time = time.time() - t
-    print(f"Done in {elapsed_time:.2f}.")
+    print(f"Done in {elapsed_time:.2f}s.")
 
     print("Logginig...")
     loss_info = unreplicate(train_info["loss_info"])
