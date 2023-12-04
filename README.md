@@ -22,7 +22,7 @@
 
 # Meta-Reinforcement Learning in JAX
 
-> 🥳 **XLand-MiniGrid was accepted to [Intrinsically Motivated Open-ended Learning](https://imol-workshop.github.io) workshop at NeurIPS 2023.** We look forward to seeing everyone at the poster session! 
+> 🥳 **XLand-MiniGrid was [accepted](https://openreview.net/forum?id=xALDC4aHGz) to [Intrinsically Motivated Open-ended Learning](https://imol-workshop.github.io) workshop at NeurIPS 2023.** We look forward to seeing everyone at the poster session! 
 
 **XLand-MiniGrid** is a suite of tools, grid-world environments and benchmarks for meta-reinforcement learning research inspired by 
 the diversity and depth of [XLand](https://deepmind.google/discover/blog/generally-capable-agents-emerge-from-open-ended-play/) 
@@ -49,12 +49,16 @@ TODO: update this with the latest version of the codebase...
 
 ## Installation 🎁
 
-> XLand-MiniGrid is currently in alpha stage, so expect breaking changes!
+> ⚠️ XLand-MiniGrid is currently in alpha stage, so expect breaking changes! ⚠️
+
+> ⚠️ Registration is temporarily disabled on PyPI. We will upload as soon as possible after the unfreeze. ⚠️
 
 The latest release of XLand-MiniGrid can be installed directly from PyPI:
 
 ```commandline
 pip install xminigrid
+# or directly from github
+pip install "xminigrid @ git+https://github.com/corl-team/xland-minigrid.git"
 ```
 
 Alternatively, if you want to install the latest development version from the GitHub and run provided algorithms or scripts,
@@ -129,7 +133,7 @@ the dynamics in non-trivial ways.
 
 **Rules** are the functions that can change the environment state in some deterministic 
 way according to the given conditions. **Goals** are similar to rules, except they do 
-not change the state, they only test conditions. Every task should be described with a goal, rules and initial objects. We call these **rulesets** ([definition in code]()). 
+not change the state, they only test conditions. Every task should be described with a goal, rules and initial objects. We call these **rulesets**. 
 Currently, we support only one goal per task. 
 
 To illustrate, we provide visualization for specific ruleset. To solve this task, agent should take blue pyramid and put it near the purple square to transform both 
