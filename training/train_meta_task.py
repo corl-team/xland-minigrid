@@ -45,7 +45,7 @@ class TrainConfig:
     num_envs: int = 8192
     num_steps_per_env: int = 4096
     num_steps_per_update: int = 32
-    update_epochs: int = 4
+    update_epochs: int = 1
     num_minibatches: int = 16
     total_timesteps: int = 100_000_000
     lr: float = 0.001
