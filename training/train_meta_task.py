@@ -38,9 +38,9 @@ class TrainConfig:
     benchmark_id: str = "Trivial"
     # agent
     action_emb_dim: int = 16
-    rnn_hidden_dim: int = 64
+    rnn_hidden_dim: int = 1024
     rnn_num_layers: int = 1
-    head_hidden_dim: int = 64
+    head_hidden_dim: int = 256
     # training
     num_envs: int = 8192
     num_steps_per_env: int = 4096
