@@ -53,11 +53,9 @@ TODO: update this with the latest version of the codebase...
 
 > ⚠️ Registration is temporarily disabled on PyPI. We will upload as soon as possible after the unfreeze. ⚠️
 
-The latest release of XLand-MiniGrid can be installed directly from PyPI:
+The latest release of XLand-MiniGrid can be installed directly from PyPI (soon):
 
 ```commandline
-pip install xminigrid
-# or directly from github
 pip install "xminigrid @ git+https://github.com/corl-team/xland-minigrid.git"
 ```
 
