@@ -1,11 +1,20 @@
-# TODO: this is rendering mostly ported from the original Minigrid. A bit dirty right now...
+# TODO: this is rendering mostly ported or adapted from the original Minigrid. A bit dirty right now...
 import functools
 import math
 
 import numpy as np
 
 from ..core.constants import Colors, Tiles
-from .utils import downsample, fill_coords, highlight_img, point_in_circle, point_in_rect, point_in_triangle, rotate_fn
+from .utils import (
+    downsample,
+    fill_coords,
+    highlight_img,
+    point_in_circle,
+    point_in_hexagon,
+    point_in_rect,
+    point_in_triangle,
+    rotate_fn,
+)
 
 COLORS_MAP = {
     Colors.RED: np.array((255, 0, 0)),
@@ -17,6 +26,8 @@ COLORS_MAP = {
     Colors.BLACK: np.array((0, 0, 0)),
     Colors.ORANGE: np.array((255, 140, 0)),
     Colors.WHITE: np.array((255, 255, 255)),
+    Colors.BROWN: np.array((160, 82, 45)),
+    Colors.PINK: np.array((225, 20, 147)),
 }
 
 
@@ -45,11 +56,33 @@ def _render_square(img, color):
 def _render_pyramid(img, color):
     _render_floor(img, Colors.BLACK)
     tri_fn = point_in_triangle(
-        (0.2, 0.8),
-        (0.8, 0.8),
-        (0.5, 0.25),
+        (0.15, 0.8),
+        (0.85, 0.8),
+        (0.5, 0.2),
     )
     fill_coords(img, tri_fn, COLORS_MAP[color])
+
+
+def _render_hex(img, color):
+    _render_floor(img, Colors.BLACK)
+    fill_coords(img, point_in_hexagon(0.35), COLORS_MAP[color])
+
+
+def _render_star(img, color):
+    # yes, this is a hexagram not a star, but who cares...
+    _render_floor(img, Colors.BLACK)
+    tri_fn2 = point_in_triangle(
+        (0.15, 0.75),
+        (0.85, 0.75),
+        (0.5, 0.15),
+    )
+    tri_fn1 = point_in_triangle(
+        (0.15, 0.3),
+        (0.85, 0.3),
+        (0.5, 0.9),
+    )
+    fill_coords(img, tri_fn1, COLORS_MAP[color])
+    fill_coords(img, tri_fn2, COLORS_MAP[color])
 
 
 def _render_goal(img, color):
@@ -115,6 +148,8 @@ TILES_FN_MAP = {
     Tiles.BALL: _render_ball,
     Tiles.SQUARE: _render_square,
     Tiles.PYRAMID: _render_pyramid,
+    Tiles.HEX: _render_hex,
+    Tiles.STAR: _render_star,
     Tiles.GOAL: _render_goal,
     Tiles.KEY: _render_key,
     Tiles.DOOR_LOCKED: _render_door_locked,

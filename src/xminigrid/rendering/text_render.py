@@ -17,6 +17,8 @@ COLOR_NAMES = {
     Colors.BLACK: "black",
     Colors.ORANGE: "orange",
     Colors.WHITE: "white",
+    Colors.BROWN: "brown",
+    Colors.PINK: "pink",
 }
 
 TILE_STR = {
@@ -28,6 +30,8 @@ TILE_STR = {
     Tiles.BALL: "⏺",
     Tiles.SQUARE: "▪",
     Tiles.PYRAMID: "▲",
+    Tiles.HEX: "⬢",
+    Tiles.STAR: "★",
     Tiles.GOAL: "■",
     Tiles.DOOR_LOCKED: "L",
     Tiles.DOOR_CLOSED: "C",

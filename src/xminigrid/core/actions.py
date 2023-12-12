@@ -77,7 +77,7 @@ def put_down(grid, agent):
     return new_grid, new_agent, next_position
 
 
-# TODO: may be this should be open_door action? toggle is too general
+# TODO: may be this should be open_door action? toggle is too general and box is not supported yet
 def toggle(grid, agent):
     next_position = _move(agent.position, agent.direction)
     next_tile = grid[next_position[0], next_position[1]]

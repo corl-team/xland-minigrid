@@ -3,11 +3,12 @@ from flax import struct
 
 # GRID: [tile, color]
 NUM_LAYERS = 2
-NUM_TILES = 13
-NUM_COLORS = 12
+NUM_TILES = 15
+NUM_COLORS = 14
 NUM_ACTIONS = 6
 
 
+# TODO: do we really need END_OF_MAP? seem like unseen can be used instead...
 # enums, kinda...
 class Tiles(struct.PyTreeNode):
     EMPTY: int = struct.field(pytree_node=False, default=0)
@@ -23,6 +24,8 @@ class Tiles(struct.PyTreeNode):
     DOOR_LOCKED: int = struct.field(pytree_node=False, default=10)
     DOOR_CLOSED: int = struct.field(pytree_node=False, default=11)
     DOOR_OPEN: int = struct.field(pytree_node=False, default=12)
+    HEX: int = struct.field(pytree_node=False, default=13)
+    STAR: int = struct.field(pytree_node=False, default=14)
 
 
 class Colors(struct.PyTreeNode):
@@ -38,6 +41,8 @@ class Colors(struct.PyTreeNode):
     BLACK: int = struct.field(pytree_node=False, default=9)
     ORANGE: int = struct.field(pytree_node=False, default=10)
     WHITE: int = struct.field(pytree_node=False, default=11)
+    BROWN: int = struct.field(pytree_node=False, default=12)
+    PINK: int = struct.field(pytree_node=False, default=13)
 
 
 # Only ~100 combinations so far, better to preallocate them
@@ -73,6 +78,8 @@ PICKABLE = jnp.array(
         Tiles.SQUARE,
         Tiles.PYRAMID,
         Tiles.KEY,
+        Tiles.HEX,
+        Tiles.STAR,
     )
 )
 

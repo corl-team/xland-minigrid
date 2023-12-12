@@ -112,6 +112,15 @@ def point_in_triangle(a, b, c):
     return fn
 
 
+def point_in_hexagon(s):
+    def fn(x, y):
+        x = abs(x - 0.5)
+        y = abs(y - 0.5)
+        return y < 3**0.5 * min(s - x, s / 2)
+
+    return fn
+
+
 def highlight_img(img, color=(255, 255, 255), alpha=0.30):
     blend_img = img + alpha * (np.array(color, dtype=np.uint8) - img)
     blend_img = blend_img.clip(0, 255).astype(np.uint8)

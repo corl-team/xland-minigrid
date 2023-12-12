@@ -5,6 +5,8 @@ import urllib.request
 from typing import Dict
 
 import jax
+import jax.numpy as jnp
+import jax.tree_util as jtu
 from flax import struct
 from tqdm.auto import tqdm
 
@@ -16,6 +18,11 @@ DATA_PATH = os.environ.get("XLAND_MINIGRID_DATA", os.path.expanduser("~/.xland_m
 NAME2HFFILENAME = {
     "Trivial": "xminigrid_rulesets_trivial",
 }
+
+# NAME2HFFILENAME = {
+#     "base-trivial-v0": "xminigrid_rulesets_trivial",
+#     "extended-trivial-v0": ...,
+# }
 
 
 # jit compatible sampling and indexing!
@@ -32,9 +39,19 @@ class Benchmark(struct.PyTreeNode):
     def get_ruleset(self, ruleset_id: int | jax.Array) -> RuleSet:
         return get_ruleset(self.goals, self.rules, self.init_tiles, ruleset_id)
 
-    def sample_ruleset(self, key) -> RuleSet:
+    def sample_ruleset(self, key: jax.Array) -> RuleSet:
         ruleset_id = jax.random.randint(key, shape=(), minval=0, maxval=self.num_rulesets())
         return self.get_ruleset(ruleset_id)
+
+    def shuffle(self, key) -> "Benchmark":
+        idxs = jax.random.permutation(key, jnp.arange(len(self.num_rules)))
+        return jtu.tree_map(lambda a: a[idxs], self)
+
+    def split(self, prop: float) -> tuple["Benchmark", "Benchmark"]:
+        idx = round(len(self.num_rules) * prop)
+        bench1 = jtu.tree_map(lambda a: a[:idx], self)
+        bench2 = jtu.tree_map(lambda a: a[idx:], self)
+        return bench1, bench2
 
 
 def load_benchmark(name: str) -> Benchmark:
