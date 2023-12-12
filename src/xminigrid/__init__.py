@@ -2,7 +2,7 @@ from .benchmarks import load_benchmark, registered_benchmarks
 from .registration import make, register, registered_environments
 
 # TODO: add __all__
-__version__ = "0.0.2"
+__version__ = "0.1.0"
 
 # ---------- XLand-MiniGrid environments ----------
 # TODO: reconsider grid sizes and time limits after the benchmarks are generated.

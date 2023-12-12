@@ -13,7 +13,7 @@ jax.config.update("jax_threefry_partitionable", True)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--env-id", type=str, default="MiniGrid-Empty-16x16")
-parser.add_argument("--benchmark-id", type=str, default="easy")
+parser.add_argument("--benchmark-id", type=str, default="Trivial")
 parser.add_argument("--timesteps", type=int, default=1000)
 parser.add_argument("--num-envs", type=int, default=8192)
 parser.add_argument("--num-repeat", type=int, default=10, help="Number of timing repeats")
@@ -35,7 +35,9 @@ def build_benchmark(env_id: str, num_envs: int, timesteps: int, benchmark_id: Op
 
         key, actions_key = jax.random.split(key)
         keys = jax.random.split(key, num=num_envs)
-        actions = jax.random.randint(actions_key, shape=(timesteps, num_envs), minval=0, maxval=env.num_actions())
+        actions = jax.random.randint(
+            actions_key, shape=(timesteps, num_envs), minval=0, maxval=env.num_actions(env_params)
+        )
 
         timestep = jax.vmap(env.reset, in_axes=(None, 0))(env_params, keys)
         # unroll can affect FPS greatly !!!

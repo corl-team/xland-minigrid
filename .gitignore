@@ -163,6 +163,8 @@ cython_debug/
 **/.DS_Store
 **/wandb
 **/.ipynb_checkpoints
+*-preset.yml
+*_run.sh
 
 # will remove later
 scripts/*testing*
