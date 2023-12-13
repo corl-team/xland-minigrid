@@ -68,7 +68,7 @@ install the source as follows:
 git clone git@github.com:corl-team/xland-minigrid.git
 cd xland-minigrid
 # additional dependencies for baselines
-pip install -e ".[benchmark]"
+pip install -e ".[dev,benchmark]"
 ```
 Note that the installation of JAX may differ depending on your hardware accelerator! 
 We advise users to explicitly install the correct JAX version (see the [official installation guide](https://github.com/google/jax#installation)).

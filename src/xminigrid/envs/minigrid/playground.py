@@ -30,7 +30,7 @@ _allowed_doors = cartesian_product_1d(
     _allowed_colors,
 )
 _allowed_objects = cartesian_product_1d(
-    jnp.array((Tiles.BALL, Tiles.SQUARE, Tiles.PYRAMID, Tiles.KEY, Tiles.GOAL), dtype=jnp.uint8),
+    jnp.array((Tiles.BALL, Tiles.SQUARE, Tiles.PYRAMID, Tiles.KEY, Tiles.STAR, Tiles.HEX, Tiles.GOAL), dtype=jnp.uint8),
     _allowed_colors,
 )
 # number of doors with 9 rooms

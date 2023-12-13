@@ -24,6 +24,8 @@ _allowed_entities = jnp.array(
         Tiles.BALL,
         Tiles.SQUARE,
         Tiles.PYRAMID,
+        Tiles.HEX,
+        Tiles.STAR,
     )
 )
 _rule_encoding = EmptyRule().encode()[None, ...]

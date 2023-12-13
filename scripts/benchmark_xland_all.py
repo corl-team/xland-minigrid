@@ -1,5 +1,6 @@
+# Performance benchmark for all environments. For the paper and to check regressions after new features.
 import argparse
-import time
+import pprint
 import timeit
 from typing import Optional
 
@@ -7,16 +8,17 @@ import jax
 import jax.tree_util as jtu
 import numpy as np
 import xminigrid
+from tqdm.auto import tqdm
 from xminigrid import load_benchmark
 from xminigrid.wrappers import GymAutoResetWrapper
 
 jax.config.update("jax_threefry_partitionable", True)
 
+NUM_ENVS = (512, 1024, 2048, 4096, 8192)
+
 parser = argparse.ArgumentParser()
-parser.add_argument("--env-id", type=str, default="MiniGrid-Empty-16x16")
 parser.add_argument("--benchmark-id", type=str, default="Trivial")
 parser.add_argument("--timesteps", type=int, default=1000)
-parser.add_argument("--num-envs", type=int, default=8192)
 parser.add_argument("--num-repeat", type=int, default=10, help="Number of timing repeats")
 parser.add_argument("--num-iter", type=int, default=1, help="Number of runs during one repeat (time is summed)")
 
@@ -51,52 +53,39 @@ def build_benchmark(env_id: str, num_envs: int, timesteps: int, benchmark_id: Op
 # see https://stackoverflow.com/questions/56763416/what-is-diffrence-between-number-and-repeat-in-python-timeit
 # on why we divide by args.num_iter
 def timeit_benchmark(args, benchmark_fn):
-    t = time.time()
     benchmark_fn().state.grid.block_until_ready()
-    print(f"Compilation time: {time.time() - t}")
     times = timeit.repeat(
         lambda: benchmark_fn().state.grid.block_until_ready(),
         number=args.num_iter,
         repeat=args.num_repeat,
     )
     times = np.array(times) / args.num_iter
-
     elapsed_time = np.max(times)
-    print(f"Elapsed time: {elapsed_time:.5f}s")
     return elapsed_time
 
 
+# that can take a while!
 if __name__ == "__main__":
     num_devices = jax.local_device_count()
     args = parser.parse_args()
-    assert args.num_envs % num_devices == 0
-    print("Num devices for pmap:", num_devices)
+    print("Num devices:", num_devices)
 
-    # building for single env benchmarking
-    benchmark_fn_single = build_benchmark(args.env_id, 1, args.timesteps, args.benchmark_id)
-    benchmark_fn_single = jax.jit(benchmark_fn_single)
-    # building vmap for vectorization benchmarking
-    benchmark_fn_vmap = build_benchmark(args.env_id, args.num_envs, args.timesteps, args.benchmark_id)
-    benchmark_fn_vmap = jax.jit(benchmark_fn_vmap)
-    # building pmap for multi-gpu benchmarking (each doing (num_envs / num_devices) vmaps)
-    benchmark_fn_pmap = build_benchmark(args.env_id, args.num_envs // num_devices, args.timesteps, args.benchmark_id)
-    benchmark_fn_pmap = jax.pmap(benchmark_fn_pmap)
+    summary = {}
+    for num_envs in tqdm(NUM_ENVS, desc="Benchmark", leave=False):
+        results = {}
+        for env_id in tqdm(xminigrid.registered_environments(), desc="Envs.."):
+            assert num_envs % num_devices == 0
+            # building pmap for multi-gpu benchmarking (each doing (num_envs / num_devices) vmaps)
+            benchmark_fn_pmap = build_benchmark(env_id, num_envs // num_devices, args.timesteps, args.benchmark_id)
+            benchmark_fn_pmap = jax.pmap(benchmark_fn_pmap)
 
-    key = jax.random.PRNGKey(0)
-    pmap_keys = jax.random.split(key, num=num_devices)
+            # benchmarking
+            pmap_keys = jax.random.split(jax.random.PRNGKey(0), num=num_devices)
 
-    # benchmarking
-    elapsed_time = timeit_benchmark(args, jtu.Partial(benchmark_fn_single, key))
-    single_fps = args.timesteps / elapsed_time
-    print(f"Single env, Elapsed time: {elapsed_time:.5f}s, FPS: {single_fps:.0f}")
-    print()
-    elapsed_time = timeit_benchmark(args, jtu.Partial(benchmark_fn_vmap, key))
-    vmap_fps = (args.timesteps * args.num_envs) / elapsed_time
-    print(f"Vmap env, Elapsed time: {elapsed_time:.5f}s, FPS: {vmap_fps:.0f}")
-    print()
-    elapsed_time = timeit_benchmark(args, jtu.Partial(benchmark_fn_pmap, pmap_keys))
-    pmap_fps = (args.timesteps * args.num_envs) / elapsed_time
-    print(f"Pmap env, Elapsed time: {elapsed_time:.5f}s, FPS: {pmap_fps:.0f}")
-    print()
-    print(f"FPS increase with vmap: {vmap_fps / single_fps:.0f}")
-    print(f"FPS increase with pmap: {pmap_fps / single_fps:.0f}")
+            elapsed_time = timeit_benchmark(args, jtu.Partial(benchmark_fn_pmap, pmap_keys))
+            pmap_fps = (args.timesteps * num_envs) // elapsed_time
+
+            results[env_id] = int(pmap_fps)
+        summary[num_envs] = results
+
+    pprint.pprint(summary)
