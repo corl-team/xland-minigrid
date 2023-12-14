@@ -21,6 +21,15 @@ def check_goal(encoding, grid, agent, action, position):
             lambda: TileNearGoal.decode(encoding)(grid, agent, action, position),
             lambda: TileOnPositionGoal.decode(encoding)(grid, agent, action, position),
             lambda: AgentOnPositionGoal.decode(encoding)(grid, agent, action, position),
+            # goals for the extended benchmarks
+            lambda: TileNearUpGoal.decode(encoding)(grid, agent, action, position),
+            lambda: TileNearRightGoal.decode(encoding)(grid, agent, action, position),
+            lambda: TileNearDownGoal.decode(encoding)(grid, agent, action, position),
+            lambda: TileNearLeftGoal.decode(encoding)(grid, agent, action, position),
+            lambda: AgentNearUpGoal.decode(encoding)(grid, agent, action, position),
+            lambda: AgentNearRightGoal.decode(encoding)(grid, agent, action, position),
+            lambda: AgentNearDownGoal.decode(encoding)(grid, agent, action, position),
+            lambda: AgentNearLeftGoal.decode(encoding)(grid, agent, action, position),
         ),
     )
     return check
@@ -128,7 +137,7 @@ class TileNearGoal(BaseGoal):
                     equal(up, tile_b) | equal(right, tile_b) | equal(down, tile_b) | equal(left, tile_b),
                     equal(up, tile_a) | equal(right, tile_a) | equal(down, tile_a) | equal(left, tile_a),
                 ),
-                jnp.array(False),
+                jnp.asarray(False),
             )
             return check
 
@@ -175,4 +184,230 @@ class AgentOnPositionGoal(BaseGoal):
 
     def encode(self):
         encoding = jnp.hstack([jnp.asarray(6), self.position], dtype=jnp.uint8)
+        return pad_along_axis(encoding, MAX_GOAL_ENCODING_LEN)
+
+
+class TileNearUpGoal(BaseGoal):
+    tile_a: jax.Array
+    tile_b: jax.Array
+
+    def __call__(self, grid, agent, action, position):
+        y, x = position
+        tile = grid[y, x]
+
+        def _check_fn():
+            up, _, down, _ = get_neighbouring_tiles(grid, y, x)
+            check = jnp.logical_or(
+                equal(tile, self.tile_b) & equal(down, self.tile_a), equal(tile, self.tile_a) & equal(up, self.tile_b)
+            )
+            return check
+
+        check = jax.lax.select(
+            jnp.equal(action, 4) & (equal(tile, self.tile_a) | equal(tile, self.tile_b)),
+            _check_fn(),
+            jnp.asarray(False),
+        )
+        return check
+
+    @classmethod
+    def decode(cls, encoding):
+        return cls(tile_a=encoding[1:3], tile_b=encoding[3:5])
+
+    def encode(self):
+        encoding = jnp.hstack([jnp.asarray(7), self.tile_a, self.tile_b])
+        return pad_along_axis(encoding, MAX_GOAL_ENCODING_LEN)
+
+
+class TileNearRightGoal(BaseGoal):
+    tile_a: jax.Array
+    tile_b: jax.Array
+
+    def __call__(self, grid, agent, action, position):
+        y, x = position
+        tile = grid[y, x]
+
+        def _check_fn():
+            _, right, _, left = get_neighbouring_tiles(grid, y, x)
+            check = jnp.logical_or(
+                equal(tile, self.tile_b) & equal(left, self.tile_a),
+                equal(tile, self.tile_a) & equal(right, self.tile_b),
+            )
+            return check
+
+        check = jax.lax.select(
+            jnp.equal(action, 4) & (equal(tile, self.tile_a) | equal(tile, self.tile_b)),
+            _check_fn(),
+            jnp.asarray(False),
+        )
+        return check
+
+    @classmethod
+    def decode(cls, encoding):
+        return cls(tile_a=encoding[1:3], tile_b=encoding[3:5])
+
+    def encode(self):
+        encoding = jnp.hstack([jnp.asarray(8), self.tile_a, self.tile_b])
+        return pad_along_axis(encoding, MAX_GOAL_ENCODING_LEN)
+
+
+class TileNearDownGoal(BaseGoal):
+    tile_a: jax.Array
+    tile_b: jax.Array
+
+    def __call__(self, grid, agent, action, position):
+        y, x = position
+        tile = grid[y, x]
+
+        def _check_fn():
+            up, _, down, _ = get_neighbouring_tiles(grid, y, x)
+            check = jnp.logical_or(
+                equal(tile, self.tile_b) & equal(up, self.tile_a), equal(tile, self.tile_a) & equal(down, self.tile_b)
+            )
+            return check
+
+        check = jax.lax.select(
+            jnp.equal(action, 4) & (equal(tile, self.tile_a) | equal(tile, self.tile_b)),
+            _check_fn(),
+            jnp.asarray(False),
+        )
+        return check
+
+    @classmethod
+    def decode(cls, encoding):
+        return cls(tile_a=encoding[1:3], tile_b=encoding[3:5])
+
+    def encode(self):
+        encoding = jnp.hstack([jnp.asarray(9), self.tile_a, self.tile_b])
+        return pad_along_axis(encoding, MAX_GOAL_ENCODING_LEN)
+
+
+class TileNearLeftGoal(BaseGoal):
+    tile_a: jax.Array
+    tile_b: jax.Array
+
+    def __call__(self, grid, agent, action, position):
+        y, x = position
+        tile = grid[y, x]
+
+        def _check_fn():
+            _, right, _, left = get_neighbouring_tiles(grid, y, x)
+            check = jnp.logical_or(
+                equal(tile, self.tile_b) & equal(right, self.tile_a),
+                equal(tile, self.tile_a) & equal(left, self.tile_b),
+            )
+            return check
+
+        check = jax.lax.select(
+            jnp.equal(action, 4) & (equal(tile, self.tile_a) | equal(tile, self.tile_b)),
+            _check_fn(),
+            jnp.asarray(False),
+        )
+        return check
+
+    @classmethod
+    def decode(cls, encoding):
+        return cls(tile_a=encoding[1:3], tile_b=encoding[3:5])
+
+    def encode(self):
+        encoding = jnp.hstack([jnp.asarray(10), self.tile_a, self.tile_b])
+        return pad_along_axis(encoding, MAX_GOAL_ENCODING_LEN)
+
+
+class AgentNearUpGoal(BaseGoal):
+    tile: jax.Array
+
+    def __call__(self, grid, agent, action, position):
+        def _check_fn():
+            up, _, _, _ = get_neighbouring_tiles(grid, agent.position[0], agent.position[1])
+            check = equal(up, self.tile)
+            return check
+
+        check = jax.lax.select(
+            jnp.equal(action, 0) | jnp.equal(action, 4),
+            _check_fn(),
+            jnp.asarray(False),
+        )
+        return check
+
+    @classmethod
+    def decode(cls, encoding):
+        return cls(tile=encoding[1:3])
+
+    def encode(self):
+        encoding = jnp.hstack([jnp.asarray(11), self.tile])
+        return pad_along_axis(encoding, MAX_GOAL_ENCODING_LEN)
+
+
+class AgentNearRightGoal(BaseGoal):
+    tile: jax.Array
+
+    def __call__(self, grid, agent, action, position):
+        def _check_fn():
+            _, right, _, _ = get_neighbouring_tiles(grid, agent.position[0], agent.position[1])
+            check = equal(right, self.tile)
+            return check
+
+        check = jax.lax.select(
+            jnp.equal(action, 0) | jnp.equal(action, 4),
+            _check_fn(),
+            jnp.asarray(False),
+        )
+        return check
+
+    @classmethod
+    def decode(cls, encoding):
+        return cls(tile=encoding[1:3])
+
+    def encode(self):
+        encoding = jnp.hstack([jnp.asarray(12), self.tile])
+        return pad_along_axis(encoding, MAX_GOAL_ENCODING_LEN)
+
+
+class AgentNearDownGoal(BaseGoal):
+    tile: jax.Array
+
+    def __call__(self, grid, agent, action, position):
+        def _check_fn():
+            _, _, down, _ = get_neighbouring_tiles(grid, agent.position[0], agent.position[1])
+            check = equal(down, self.tile)
+            return check
+
+        check = jax.lax.select(
+            jnp.equal(action, 0) | jnp.equal(action, 4),
+            _check_fn(),
+            jnp.asarray(False),
+        )
+        return check
+
+    @classmethod
+    def decode(cls, encoding):
+        return cls(tile=encoding[1:3])
+
+    def encode(self):
+        encoding = jnp.hstack([jnp.asarray(13), self.tile])
+        return pad_along_axis(encoding, MAX_GOAL_ENCODING_LEN)
+
+
+class AgentNearLeftGoal(BaseGoal):
+    tile: jax.Array
+
+    def __call__(self, grid, agent, action, position):
+        def _check_fn():
+            _, _, _, left = get_neighbouring_tiles(grid, agent.position[0], agent.position[1])
+            check = equal(left, self.tile)
+            return check
+
+        check = jax.lax.select(
+            jnp.equal(action, 0) | jnp.equal(action, 4),
+            _check_fn(),
+            jnp.asarray(False),
+        )
+        return check
+
+    @classmethod
+    def decode(cls, encoding):
+        return cls(tile=encoding[1:3])
+
+    def encode(self):
+        encoding = jnp.hstack([jnp.asarray(14), self.tile])
         return pad_along_axis(encoding, MAX_GOAL_ENCODING_LEN)

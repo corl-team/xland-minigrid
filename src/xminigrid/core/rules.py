@@ -10,11 +10,12 @@ from .grid import equal, get_neighbouring_tiles, pad_along_axis
 MAX_RULE_ENCODING_LEN = 6 + 1  # +1 for idx
 
 
-# this is very costly, will evaluate all under vmap. Submit a PR if you know how to do it better!
+# this is very costly, will evaluate all rules under vmap. Submit a PR if you know how to do it better!
+# In general, we need a way to select specific function/class based on ID number.
+# We can not just decode without evaluation, as then return type will be different between branches
 def check_rule(encodings, grid, agent, action, position):
     def _check(carry, encoding):
         grid, agent = carry
-        # What if use lax.cond here instead? Will it be faster?
         grid, agent = jax.lax.switch(
             encoding[0],
             (
@@ -23,6 +24,7 @@ def check_rule(encodings, grid, agent, action, position):
                 lambda: AgentHoldRule.decode(encoding)(grid, agent, action, position),
                 lambda: AgentNearRule.decode(encoding)(grid, agent, action, position),
                 lambda: TileNearRule.decode(encoding)(grid, agent, action, position),
+                # rules for the extended benchmarks
                 lambda: TileNearUpRule.decode(encoding)(grid, agent, action, position),
                 lambda: TileNearRightRule.decode(encoding)(grid, agent, action, position),
                 lambda: TileNearDownRule.decode(encoding)(grid, agent, action, position),
@@ -363,7 +365,11 @@ class AgentNearUpRule(BaseRule):
             )
             return grid
 
-        grid = jax.lax.cond(jnp.equal(action, 0) | jnp.equal(action, 4), lambda: _rule_fn(grid), lambda: grid)
+        grid = jax.lax.cond(
+            jnp.equal(action, 0) | jnp.equal(action, 4),
+            lambda: _rule_fn(grid),
+            lambda: grid,
+        )
         return grid, agent
 
     @classmethod
@@ -390,7 +396,11 @@ class AgentNearRightRule(BaseRule):
             )
             return grid
 
-        grid = jax.lax.cond(jnp.equal(action, 0) | jnp.equal(action, 4), lambda: _rule_fn(grid), lambda: grid)
+        grid = jax.lax.cond(
+            jnp.equal(action, 0) | jnp.equal(action, 4),
+            lambda: _rule_fn(grid),
+            lambda: grid,
+        )
         return grid, agent
 
     @classmethod
@@ -417,7 +427,11 @@ class AgentNearDownRule(BaseRule):
             )
             return grid
 
-        grid = jax.lax.cond(jnp.equal(action, 0) | jnp.equal(action, 4), lambda: _rule_fn(grid), lambda: grid)
+        grid = jax.lax.cond(
+            jnp.equal(action, 0) | jnp.equal(action, 4),
+            lambda: _rule_fn(grid),
+            lambda: grid,
+        )
         return grid, agent
 
     @classmethod
@@ -444,7 +458,11 @@ class AgentNearLeftRule(BaseRule):
             )
             return grid
 
-        grid = jax.lax.cond(jnp.equal(action, 0) | jnp.equal(action, 4), lambda: _rule_fn(grid), lambda: grid)
+        grid = jax.lax.cond(
+            jnp.equal(action, 0) | jnp.equal(action, 4),
+            lambda: _rule_fn(grid),
+            lambda: grid,
+        )
         return grid, agent
 
     @classmethod

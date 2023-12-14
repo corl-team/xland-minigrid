@@ -35,7 +35,7 @@ class Environment:
 
     # TODO: NOT sure that this should be hardcoded like that...
     def time_limit(self, params: EnvParams) -> int:
-        return 256
+        return 3 * params.height * params.width
 
     def _generate_problem(self, params: EnvParams, key: jax.Array) -> State:
         return NotImplemented
