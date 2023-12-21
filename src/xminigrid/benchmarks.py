@@ -2,7 +2,7 @@ import bz2
 import os
 import pickle
 import urllib.request
-from typing import Dict
+from typing import Callable, Dict
 
 import jax
 import jax.numpy as jnp
@@ -15,14 +15,21 @@ from .types import RuleSet
 HF_REPO_ID = os.environ.get("XLAND_MINIGRID_HF_REPO_ID", "Howuhh/xland_minigrid")
 DATA_PATH = os.environ.get("XLAND_MINIGRID_DATA", os.path.expanduser("~/.xland_minigrid"))
 
-NAME2HFFILENAME = {
-    "Trivial": "xminigrid_rulesets_trivial",
-}
 
-# NAME2HFFILENAME = {
-#     "base-trivial-v0": "xminigrid_rulesets_trivial",
-#     "extended-trivial-v0": ...,
-# }
+NAME2HFFILENAME = {
+    # 1M pre-sampled tasks
+    "trivial-1M": "trivial_1m",
+    "small-1M": "small_1m",
+    "small-dist-1M": "small_dist_1m",
+    "medium-1M": "medium_1m",
+    "high-1M": "high_1m",
+    # 5M pre-sampled tasks (TODO)
+    "trivial-5M": "",
+    "small-5M": "",
+    "small-dist-5M": "",
+    "medium-5M": "",
+    "high-5M": "",
+}
 
 
 # jit compatible sampling and indexing!
@@ -51,6 +58,13 @@ class Benchmark(struct.PyTreeNode):
         idx = round(len(self.num_rules) * prop)
         bench1 = jtu.tree_map(lambda a: a[:idx], self)
         bench2 = jtu.tree_map(lambda a: a[idx:], self)
+        return bench1, bench2
+
+    def filter_split(self, fn: Callable[[jax.Array, jax.Array], bool]) -> tuple["Benchmark", "Benchmark"]:
+        # fn(single_goal, single_rules) -> bool
+        mask = jax.vmap(fn)(self.goals, self.rules)
+        bench1 = jtu.tree_map(lambda a: a[mask], self)
+        bench2 = jtu.tree_map(lambda a: a[~mask], self)
         return bench1, bench2
 
 

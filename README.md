@@ -16,6 +16,9 @@
     <a href="https://github.com/astral-sh/ruff">
         <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v2.json"/>
     </a>
+    <a href="https://twitter.com/vladkurenkov/status/1731709425524543550">
+        <img src="https://badgen.net/badge/icon/twitter?icon=twitter&label"/>
+    </a>
     <a target="_blank" href="https://colab.research.google.com/github/corl-team/xland-minigrid/blob/main/examples/walkthrough.ipynb">
       <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
     </a>
@@ -88,7 +91,7 @@ key = jax.random.PRNGKey(0)
 reset_key, ruleset_key = jax.random.split(key)
 
 # to list available benchmarks: xminigrid.registered_benchmarks()
-benchmark = xminigrid.load_benchmark(name="Trivial")
+benchmark = xminigrid.load_benchmark(name="trivial-1m")
 # choosing ruleset, see section on rules and goals
 ruleset = benchmark.sample_ruleset(ruleset_key)
 
@@ -150,11 +153,11 @@ While composing rules and goals by hand is flexible, it can quickly become cumbe
 Besides, it's hard to express efficiently in a JAX-compatible way due to the high number of heterogeneous computations 
 
 To avoid significant overhead during training and facilitate reliable comparisons between agents, 
-we pre-sampled several benchmarks with up to **one million unique tasks**, following the procedure used to train DeepMind 
+we pre-sampled several benchmarks with up to **five million unique tasks**, following the procedure used to train DeepMind 
 AdA agent from the original XLand. These benchmarks differ in the generation configs, producing distributions with
 varying levels of diversity and average difficulty of the tasks. They can be used for different purposes, for example
-the `Trivial` benchmark can be used to debug your agents, allowing very quick iterations. However, we would caution 
-against treating benchmarks as a progression from simple to complex. They are just different 🤷.  
+the `trivial-1m` benchmark can be used to debug your agents, allowing very quick iterations. However, we would caution 
+against treating benchmarks as a progression from simple to complex. They are just different 🤷.
 
 Pre-sampled benchmarks are hosted on [HuggingFace](https://huggingface.co/datasets/Howuhh/xland_minigrid/tree/main) and will be downloaded and cached on the first use:
 
@@ -165,13 +168,16 @@ from xminigrid.benchmarks import Benchmark
 
 # downloading to path specified by XLAND_MINIGRID_DATA,
 # ~/.xland_minigrid by default
-benchmark: Benchmark = xminigrid.load_benchmark(name="Trivial")
+benchmark: Benchmark = xminigrid.load_benchmark(name="trivial-1m")
 # reusing cached on the second use
-benchmark: Benchmark = xminigrid.load_benchmark(name="Trivial")
+benchmark: Benchmark = xminigrid.load_benchmark(name="trivial-1m")
 
 # users can sample or get specific rulesets
 benchmark.sample_ruleset(jax.random.PRNGKey(0))
 benchmark.get_ruleset(ruleset_id=benchmark.num_rulesets() - 1)
+
+# or split them for train & test
+train, test = benchmark.shuffle(key=jax.random.PRNGKey(0)).split(prop=0.8)
 ```
 
 We also provide the [script](scripts/ruleset_generator.py) used to generate these benchmarks. Users can use it for their own purposes:
@@ -181,7 +187,7 @@ python scripts/ruleset_generator.py --help
 
 In depth description of all available benchmarks is provided [here (soon)]().
 
-**P.S.** Currently only one benchmark is available. We will release more after some testing and configs balancing. Stay tuned!
+**P.S.** Be aware, that benchmarks can change, as we are currently testing and balancing them!
 
 ## Environments 🌍
 

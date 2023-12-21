@@ -47,6 +47,8 @@ RULE_TILE_STR = {
     Tiles.PYRAMID: "pyramid",
     Tiles.GOAL: "goal",
     Tiles.KEY: "key",
+    Tiles.HEX: "hexagon",
+    Tiles.STAR: "star",
 }
 
 PLAYER_STR = {0: "^", 1: ">", 2: "V", 3: "<"}
@@ -78,21 +80,35 @@ def render(grid: jax.Array, agent: AgentState | None = None) -> str:
     return string
 
 
-# WARN: This is also for debugging mainly!
-def _text_encode_tile(tile):
+# WARN: This is for debugging mainly! Will refactor later if needed.
+def _encode_tile(tile):
     return f"{COLOR_NAMES[tile[1]]} {RULE_TILE_STR[tile[0]]}"
 
 
 def _text_encode_goal(goal):
     goal_id = goal[0]
     if goal_id == 1:
-        return f"AgentHold({_text_encode_tile(goal[1:3])})"
+        return f"AgentHold({_encode_tile(goal[1:3])})"
     elif goal_id == 3:
-        return f"AgentNear({_text_encode_tile(goal[1:3])})"
+        return f"AgentNear({_encode_tile(goal[1:3])})"
     elif goal_id == 4:
-        tile_a = _text_encode_tile(goal[1:3])
-        tile_b = _text_encode_tile(goal[3:5])
-        return f"TileNear({tile_a}, {tile_b})"
+        return f"TileNear({_encode_tile(goal[1:3])}, {_encode_tile(goal[3:5])})"
+    elif goal_id == 7:
+        return f"TileNearUpGoal({_encode_tile(goal[1:3])}, {_encode_tile(goal[3:5])})"
+    elif goal_id == 8:
+        return f"TileNearRightGoal({_encode_tile(goal[1:3])}, {_encode_tile(goal[3:5])})"
+    elif goal_id == 9:
+        return f"TileNearDownGoal({_encode_tile(goal[1:3])}, {_encode_tile(goal[3:5])})"
+    elif goal_id == 10:
+        return f"TileNearLeftGoal({_encode_tile(goal[1:3])}, {_encode_tile(goal[3:5])})"
+    elif goal_id == 11:
+        return f"AgentNearUpGoal({_encode_tile(goal[1:3])})"
+    elif goal_id == 12:
+        return f"AgentNearRightGoal({_encode_tile(goal[1:3])})"
+    elif goal_id == 13:
+        return f"AgentNearDownGoal({_encode_tile(goal[1:3])})"
+    elif goal_id == 14:
+        return f"AgentNearLeftGoal({_encode_tile(goal[1:3])})"
     else:
         raise RuntimeError(f"Rendering: Unknown goal id: {goal_id}")
 
@@ -100,18 +116,27 @@ def _text_encode_goal(goal):
 def _text_encode_rule(rule):
     rule_id = rule[0]
     if rule_id == 1:
-        tile = _text_encode_tile(rule[1:3])
-        prod_tile = _text_encode_tile(rule[3:5])
-        return f"AgentHold({tile}) -> {prod_tile}"
+        return f"AgentHold({_encode_tile(rule[1:3])}) -> {_encode_tile(rule[3:5])}"
     elif rule_id == 2:
-        tile = _text_encode_tile(rule[1:3])
-        prod_tile = _text_encode_tile(rule[3:5])
-        return f"AgentNear({tile}) -> {prod_tile}"
+        return f"AgentNear({_encode_tile(rule[1:3])}) -> {_encode_tile(rule[3:5])}"
     elif rule_id == 3:
-        tile_a = _text_encode_tile(rule[1:3])
-        tile_b = _text_encode_tile(rule[3:5])
-        prod_tile = _text_encode_tile(rule[5:7])
-        return f"TileNear({tile_a}, {tile_b}) -> {prod_tile}"
+        return f"TileNear({_encode_tile(rule[1:3])}, {_encode_tile(rule[3:5])}) -> {_encode_tile(rule[5:7])}"
+    elif rule_id == 4:
+        return f"TileNearUpRule({_encode_tile(rule[1:3])}, {_encode_tile(rule[3:5])}) -> {_encode_tile(rule[5:7])}"
+    elif rule_id == 5:
+        return f"TileNearRightRule({_encode_tile(rule[1:3])}, {_encode_tile(rule[3:5])}) -> {_encode_tile(rule[5:7])}"
+    elif rule_id == 6:
+        return f"TileNearDownRule({_encode_tile(rule[1:3])}, {_encode_tile(rule[3:5])}) -> {_encode_tile(rule[5:7])}"
+    elif rule_id == 7:
+        return f"TileNearLeftRule({_encode_tile(rule[1:3])}, {_encode_tile(rule[3:5])}) -> {_encode_tile(rule[5:7])}"
+    elif rule_id == 8:
+        return f"AgentNearUpRule({_encode_tile(rule[1:3])}) -> {_encode_tile(rule[3:5])}"
+    elif rule_id == 9:
+        return f"AgentNearRightRule({_encode_tile(rule[1:3])}) -> {_encode_tile(rule[3:5])}"
+    elif rule_id == 10:
+        return f"AgentNearDownRule({_encode_tile(rule[1:3])}) -> {_encode_tile(rule[3:5])}"
+    elif rule_id == 11:
+        return f"AgentNearLeftRule({_encode_tile(rule[1:3])}) -> {_encode_tile(rule[3:5])}"
     else:
         raise RuntimeError(f"Rendering: Unknown rule id: {rule_id}")
 
@@ -128,4 +153,4 @@ def print_ruleset(ruleset: RuleSet):
     print("INIT TILES:")
     for tile in ruleset.init_tiles.tolist():
         if tile[0] != 0:
-            print(_text_encode_tile(tile))
+            print(_encode_tile(tile))

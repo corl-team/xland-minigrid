@@ -33,9 +33,9 @@ jax.config.update("jax_threefry_partitionable", True)
 class TrainConfig:
     project: str = "xminigrid"
     group: str = "default"
-    name: str = "meta_task_ppo"
-    env_id: str = "XLand-Minigrid-R1-8x8"
-    benchmark_id: str = "Trivial"
+    name: str = "meta-task-ppo"
+    env_id: str = "XLand-Minigrid-R1-9x9"
+    benchmark_id: str = "trivial-1m"
     # agent
     action_emb_dim: int = 16
     rnn_hidden_dim: int = 1024

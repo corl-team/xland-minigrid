@@ -10,25 +10,61 @@ import jax.numpy as jnp
 from tqdm.auto import tqdm, trange
 from xminigrid.benchmarks import save_bz2_pickle
 from xminigrid.core.constants import Colors, Tiles
-from xminigrid.core.goals import AgentHoldGoal, AgentNearGoal, TileNearGoal
+from xminigrid.core.goals import (
+    AgentHoldGoal,
+    AgentNearDownGoal,
+    AgentNearGoal,
+    AgentNearLeftGoal,
+    AgentNearRightGoal,
+    AgentNearUpGoal,
+    TileNearDownGoal,
+    TileNearGoal,
+    TileNearLeftGoal,
+    TileNearRightGoal,
+    TileNearUpGoal,
+)
 from xminigrid.core.grid import pad_along_axis
-from xminigrid.core.rules import AgentHoldRule, AgentNearRule, EmptyRule, TileNearRule
+from xminigrid.core.rules import (
+    AgentHoldRule,
+    AgentNearDownRule,
+    AgentNearLeftRule,
+    AgentNearRightRule,
+    AgentNearRule,
+    AgentNearUpRule,
+    EmptyRule,
+    TileNearDownRule,
+    TileNearLeftRule,
+    TileNearRightRule,
+    TileNearRule,
+    TileNearUpRule,
+)
 
-COLORS = [Colors.RED, Colors.GREEN, Colors.BLUE, Colors.PURPLE, Colors.YELLOW, Colors.GREY, Colors.WHITE]
+COLORS = [
+    Colors.RED,
+    Colors.GREEN,
+    Colors.BLUE,
+    Colors.PURPLE,
+    Colors.YELLOW,
+    Colors.GREY,
+    Colors.WHITE,
+    Colors.BROWN,
+    Colors.PINK,
+    Colors.ORANGE,
+]
 
 # we need to distinguish between them, to avoid sampling
 # near(goal, goal) goal or rule as goal tiles are not pickable
-NEAR_TILES_LHS = list(product([Tiles.BALL, Tiles.SQUARE, Tiles.PYRAMID, Tiles.KEY, Tiles.GOAL], COLORS))
+NEAR_TILES_LHS = list(
+    product([Tiles.BALL, Tiles.SQUARE, Tiles.PYRAMID, Tiles.KEY, Tiles.STAR, Tiles.HEX, Tiles.GOAL], COLORS)
+)
 # these are pickable!
-NEAR_TILES_RHS = list(product([Tiles.BALL, Tiles.SQUARE, Tiles.PYRAMID, Tiles.KEY], COLORS))
+NEAR_TILES_RHS = list(product([Tiles.BALL, Tiles.SQUARE, Tiles.PYRAMID, Tiles.KEY, Tiles.STAR, Tiles.HEX], COLORS))
 
-HOLD_TILES = list(product([Tiles.BALL, Tiles.SQUARE, Tiles.PYRAMID, Tiles.KEY], COLORS))
-PROD_TILES = list(product([Tiles.BALL, Tiles.SQUARE, Tiles.PYRAMID, Tiles.KEY], COLORS))
+HOLD_TILES = list(product([Tiles.BALL, Tiles.SQUARE, Tiles.PYRAMID, Tiles.KEY, Tiles.STAR, Tiles.HEX], COLORS))
+
 # to imitate disappearance production rule
+PROD_TILES = list(product([Tiles.BALL, Tiles.SQUARE, Tiles.PYRAMID, Tiles.KEY, Tiles.STAR, Tiles.HEX], COLORS))
 PROD_TILES = PROD_TILES + [(Tiles.FLOOR, Colors.BLACK)]
-
-GOALS = (AgentHoldGoal, AgentNearGoal, TileNearGoal)
-RULES = (AgentHoldRule, AgentNearRule, TileNearRule)
 
 
 def encode(ruleset):
@@ -41,42 +77,72 @@ def diff(list1, list2):
 
 
 def sample_goal():
-    goal_idx = random.randint(0, 2)
+    goals = (
+        AgentHoldGoal,
+        # agent near variations
+        AgentNearGoal,
+        AgentNearUpGoal,
+        AgentNearDownGoal,
+        AgentNearLeftGoal,
+        AgentNearRightGoal,
+        # tile near variations
+        TileNearGoal,
+        TileNearUpGoal,
+        TileNearDownGoal,
+        TileNearLeftGoal,
+        TileNearRightGoal,
+    )
+    goal_idx = random.randint(0, 10)
     if goal_idx == 0:
         tile = random.choice(HOLD_TILES)
-        goal = AgentHoldGoal(tile=jnp.array(tile))
+        goal = goals[0](tile=jnp.array(tile))
         return goal, (tile,)
-    elif goal_idx == 1:
+    elif 1 <= goal_idx <= 5:
         tile = random.choice(NEAR_TILES_LHS)
-        goal = AgentNearGoal(tile=jnp.array(tile))
+        goal = goals[goal_idx](tile=jnp.array(tile))
         return goal, (tile,)
-    elif goal_idx == 2:
+    elif 6 <= goal_idx <= 10:
         tile_a = random.choice(NEAR_TILES_LHS)
         tile_b = random.choice(NEAR_TILES_RHS)
-        goal = TileNearGoal(tile_a=jnp.array(tile_a), tile_b=jnp.array(tile_b))
+        goal = goals[goal_idx](tile_a=jnp.array(tile_a), tile_b=jnp.array(tile_b))
         return goal, (tile_a, tile_b)
     else:
-        raise RuntimeError(f"Unknown goal, should be one of: {GOALS}")
+        raise RuntimeError("Unknown goal")
 
 
 def sample_rule(prod_tile, used_tiles):
-    rule_idx = random.randint(0, 2)
+    rules = (
+        AgentHoldRule,
+        # agent near variations
+        AgentNearRule,
+        AgentNearUpRule,
+        AgentNearDownRule,
+        AgentNearLeftRule,
+        AgentNearRightRule,
+        # tile near variations
+        TileNearRule,
+        TileNearUpRule,
+        TileNearDownRule,
+        TileNearLeftRule,
+        TileNearRightRule,
+    )
+    rule_idx = random.randint(0, 10)
+
     if rule_idx == 0:
         tile = random.choice(diff(HOLD_TILES, used_tiles))
-        rule = AgentHoldRule(tile=jnp.array(tile), prod_tile=jnp.array(prod_tile))
+        rule = rules[rule_idx](tile=jnp.array(tile), prod_tile=jnp.array(prod_tile))
         return rule, (tile,)
-    elif rule_idx == 1:
-        tile = random.choice(diff(NEAR_TILES_LHS, used_tiles))
-        rule = AgentNearRule(tile=jnp.array(tile), prod_tile=jnp.array(prod_tile))
+    elif 1 <= rule_idx <= 5:
+        tile = random.choice(diff(HOLD_TILES, used_tiles))
+        rule = rules[rule_idx](tile=jnp.array(tile), prod_tile=jnp.array(prod_tile))
         return rule, (tile,)
-    elif rule_idx == 2:
+    elif 6 <= rule_idx <= 10:
         tile_a = random.choice(diff(NEAR_TILES_LHS, used_tiles))
         tile_b = random.choice(diff(NEAR_TILES_RHS, used_tiles))
-
-        rule = TileNearRule(tile_a=jnp.array(tile_a), tile_b=jnp.array(tile_b), prod_tile=jnp.array(prod_tile))
+        rule = rules[rule_idx](tile_a=jnp.array(tile_a), tile_b=jnp.array(tile_b), prod_tile=jnp.array(prod_tile))
         return rule, (tile_a, tile_b)
     else:
-        raise RuntimeError(f"Unknown rule, should be one of: {RULES}")
+        raise RuntimeError("Unknown rule")
 
 
 # See Appendix A.2 in "Human-timescale adaptation in an open-ended task space" for sampling procedure.
@@ -158,7 +224,7 @@ def sample_ruleset(
         "init_tiles": init_tiles,
         # additional info (for example for biasing sampling by number of rules)
         # you can add other field if needed, just copy-paste this file!
-        "num_rules": num_levels,
+        "num_rules": len([r for r in rules if not isinstance(r, EmptyRule)]),
     }
 
 
