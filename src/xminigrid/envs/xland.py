@@ -143,11 +143,15 @@ class XLandMiniGridEnvOptions(EnvParams):
 
 class XLandMiniGrid(Environment):
     def default_params(self, **kwargs) -> XLandMiniGridEnvOptions:
-        return XLandMiniGridEnvOptions().replace(**kwargs)
+        default_params = XLandMiniGridEnvOptions(view_size=5)
+        return default_params.replace(**kwargs)
 
     def time_limit(self, params: XLandMiniGridEnvOptions) -> int:
-        # TODO: seems like it is too much for simple problems.
-        return len(params.ruleset.init_tiles) * (params.height * params.width)
+        # this is just a heuristic to prevent brute force in one episode,
+        # agent need to remember what he tried in previous episodes.
+        # If this is too small, just increase number of trials.
+        coef = len(params.ruleset.init_tiles) // 3
+        return coef * (params.height * params.width)
 
     def _generate_problem(self, params: XLandMiniGridEnvOptions, key: jax.Array) -> State:
         # WARN: we can make this compatible with jit (to vmap on different layouts during training),
