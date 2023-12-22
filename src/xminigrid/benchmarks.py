@@ -18,17 +18,17 @@ DATA_PATH = os.environ.get("XLAND_MINIGRID_DATA", os.path.expanduser("~/.xland_m
 
 NAME2HFFILENAME = {
     # 1M pre-sampled tasks
-    "trivial-1M": "trivial_1m",
-    "small-1M": "small_1m",
-    "small-dist-1M": "small_dist_1m",
-    "medium-1M": "medium_1m",
-    "high-1M": "high_1m",
+    "trivial-1m": "trivial_1m",
+    "small-1m": "small_1m",
+    "small-dist-1m": "small_dist_1m",
+    "medium-1m": "medium_1m",
+    "high-1m": "high_1m",
     # 5M pre-sampled tasks (TODO)
-    "trivial-5M": "",
-    "small-5M": "",
-    "small-dist-5M": "",
-    "medium-5M": "",
-    "high-5M": "",
+    "trivial-5m": "",
+    "small-5m": "",
+    "small-dist-5m": "",
+    "medium-5m": "",
+    "high-5m": "",
 }
 
 
