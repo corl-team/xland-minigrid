@@ -254,7 +254,7 @@ def make_train(
                 runner_state = (rng, train_state, timestep, prev_action, prev_reward, hstate)
                 return runner_state, loss_info
 
-            # on each meta-update we reset hidden to init_hstate
+            # on each meta-update we reset rnn hidden to init_hstate
             runner_state = (rng, train_state, timestep, prev_action, prev_reward, init_hstate)
             runner_state, loss_info = jax.lax.scan(_update_step, runner_state, None, config.num_inner_updates)
             # WARN: do not forget to get updated params

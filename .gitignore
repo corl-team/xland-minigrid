@@ -168,3 +168,4 @@ cython_debug/
 
 # will remove later
 scripts/*testing*
+configs

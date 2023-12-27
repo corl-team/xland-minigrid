@@ -149,9 +149,8 @@ class XLandMiniGrid(Environment):
     def time_limit(self, params: XLandMiniGridEnvOptions) -> int:
         # this is just a heuristic to prevent brute force in one episode,
         # agent need to remember what he tried in previous episodes.
-        # If this is too small, just increase number of trials.
-        coef = len(params.ruleset.init_tiles) // 3
-        return coef * (params.height * params.width)
+        # If this is too small, change it or increase number of trials (these are not equivalent).
+        return 3 * (params.height * params.width)
 
     def _generate_problem(self, params: XLandMiniGridEnvOptions, key: jax.Array) -> State:
         # WARN: we can make this compatible with jit (to vmap on different layouts during training),
