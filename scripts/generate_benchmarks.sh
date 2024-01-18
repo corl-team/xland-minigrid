@@ -1,5 +1,4 @@
 # This can take a lot of time. Generate only needed!
-# TODO: provide same for 5M benchmarks
 
 # trivial
 python scripts/ruleset_generator.py \
@@ -54,3 +53,25 @@ python scripts/ruleset_generator.py \
   --num_distractor_objects=2 \
   --total_rulesets=1_000_000 \
   --save_path="medium_dist_1m"
+
+# medium 3M
+python scripts/ruleset_generator.py \
+  --prune_chain \
+  --prune_prob=0.3 \
+  --chain_depth=2 \
+  --sample_distractor_rules \
+  --num_distractor_rules=3 \
+  --num_distractor_objects=0 \
+  --total_rulesets=3_000_000 \
+  --save_path="medium_3m"
+
+# high 3M
+python scripts/ruleset_generator.py \
+  --prune_chain \
+  --prune_prob=0.1 \
+  --chain_depth=3 \
+  --sample_distractor_rules \
+  --num_distractor_rules=4 \
+  --num_distractor_objects=1 \
+  --total_rulesets=3_000_000 \
+  --save_path="high_3m"

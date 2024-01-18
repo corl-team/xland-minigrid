@@ -165,6 +165,11 @@ cython_debug/
 **/.ipynb_checkpoints
 *-preset.yml
 *_run.sh
+training/test_train_meta_task.py
+scripts/*.pdf
+scripts/*.jpg
+scripts/*.png
+src/xminigrid/envs/xland_tmp.py
 
 # will remove later
 scripts/*testing*

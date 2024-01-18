@@ -1,7 +1,7 @@
 # This is not the fastest implementation, but c'mon,
 # I only have to run it once in forever...
 # Meanwhile, make yourself a cup of tea and relax, tqdm go brrr...
-# P.S. If you are willing to improve this, submit a PR!
+# P.S. If you are willing to improve this, submit a PR! Beware that generation should remain deterministic!
 import argparse
 import random
 from itertools import product
@@ -179,6 +179,7 @@ def sample_ruleset(
         # one empty rule as a placeholder, to fill up "rule" key, this will not introduce overhead under jit
         rules.append(EmptyRule())
 
+    # for logging
     for level in range(num_levels):
         next_chain_tiles = []
 
@@ -214,7 +215,7 @@ def sample_ruleset(
         rules.append(rule)
         init_tiles.extend(rule_tiles)
 
-    # if for some reason there are no rules, add one empty
+    # if for some reason there are no rules, add one empty (we will ignore it later)
     if len(rules) == 0:
         rules.append(EmptyRule())
 
@@ -224,7 +225,11 @@ def sample_ruleset(
         "init_tiles": init_tiles,
         # additional info (for example for biasing sampling by number of rules)
         # you can add other field if needed, just copy-paste this file!
+        # saving counts, as later they will be padded to the same size
         "num_rules": len([r for r in rules if not isinstance(r, EmptyRule)]),
+        "num_init_tiles": len(init_tiles),
+        "max_chain_depth": num_levels,
+        "num_distractor_rules": num_distractor_rules,
     }
 
 
@@ -276,6 +281,9 @@ if __name__ == "__main__":
                 "rules": jnp.vstack([r.encode() for r in ruleset["rules"]]),
                 "init_tiles": jnp.array(ruleset["init_tiles"], dtype=jnp.uint8),
                 "num_rules": jnp.asarray(ruleset["num_rules"], dtype=jnp.uint8),
+                "num_init_tiles": jnp.asarray(ruleset["num_init_tiles"], dtype=jnp.uint8),
+                "max_chain_depth": jnp.asarray(ruleset["max_chain_depth"], dtype=jnp.uint8),
+                "num_distractor_rules": jnp.asarray(ruleset["num_distractor_rules"], dtype=jnp.uint8),
             }
         )
         unique_rulesets_encodings.add(encode(ruleset))
@@ -298,6 +306,9 @@ if __name__ == "__main__":
         "rules": jnp.vstack([pad_along_axis(r["rules"], pad_to=max_rules)[None, ...] for r in rulesets]),
         "init_tiles": jnp.vstack([pad_along_axis(r["init_tiles"], pad_to=max_tiles)[None, ...] for r in rulesets]),
         "num_rules": jnp.vstack([r["num_rules"] for r in rulesets]),
+        "num_init_tiles": jnp.vstack([r["num_init_tiles"] for r in rulesets]),
+        "max_chain_depth": jnp.vstack([r["max_chain_depth"] for r in rulesets]),
+        "num_distractor_rules": jnp.vstack([r["num_distractor_rules"] for r in rulesets]),
     }
     print("Saving...")
     save_bz2_pickle(concat_rulesets, args.save_path, protocol=-1)

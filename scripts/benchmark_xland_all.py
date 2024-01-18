@@ -14,10 +14,10 @@ from xminigrid.wrappers import GymAutoResetWrapper
 
 jax.config.update("jax_threefry_partitionable", True)
 
-NUM_ENVS = (512, 1024, 2048, 4096, 8192)
+NUM_ENVS = (128, 256, 512, 1024, 2048, 4096, 8192, 16384)
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--benchmark-id", type=str, default="Trivial")
+parser.add_argument("--benchmark-id", type=str, default="trivial-1m")
 parser.add_argument("--timesteps", type=int, default=1000)
 parser.add_argument("--num-repeat", type=int, default=10, help="Number of timing repeats")
 parser.add_argument("--num-iter", type=int, default=1, help="Number of runs during one repeat (time is summed)")
@@ -70,10 +70,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print("Num devices:", num_devices)
 
+    environments = xminigrid.registered_environments()
     summary = {}
     for num_envs in tqdm(NUM_ENVS, desc="Benchmark", leave=False):
         results = {}
-        for env_id in tqdm(xminigrid.registered_environments(), desc="Envs.."):
+        for env_id in tqdm(environments, desc="Envs.."):
             assert num_envs % num_devices == 0
             # building pmap for multi-gpu benchmarking (each doing (num_envs / num_devices) vmaps)
             benchmark_fn_pmap = build_benchmark(env_id, num_envs // num_devices, args.timesteps, args.benchmark_id)
