@@ -1,15 +1,20 @@
+from __future__ import annotations
+
 import abc
 
 import jax
 import jax.numpy as jnp
 from flax import struct
 
+from ..types import AgentState, GridState
 from .grid import equal, get_neighbouring_tiles, pad_along_axis
 
 MAX_GOAL_ENCODING_LEN = 4 + 1  # for idx
 
 
-def check_goal(encoding, grid, agent, action, position):
+def check_goal(
+    encoding: jax.Array, grid: GridState, agent: AgentState, action: int | jax.Array, position: jax.Array
+) -> jax.Array:
     check = jax.lax.switch(
         encoding[0],
         (
@@ -37,16 +42,16 @@ def check_goal(encoding, grid, agent, action, position):
 
 class BaseGoal(struct.PyTreeNode):
     @abc.abstractmethod
-    def __call__(self, grid, agent, action, position):
+    def __call__(self, grid: GridState, agent: AgentState, action: int | jax.Array, position: jax.Array) -> jax.Array:
         ...
 
     @classmethod
     @abc.abstractmethod
-    def decode(cls, encoding):
+    def decode(cls, encoding: jax.Array) -> BaseGoal:
         ...
 
     @abc.abstractmethod
-    def encode(self):
+    def encode(self) -> jax.Array:
         ...
 
 

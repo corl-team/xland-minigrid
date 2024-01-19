@@ -1,11 +1,12 @@
 import jax
 import jax.numpy as jnp
 
+from ..types import AgentState, GridState
 from .constants import Tiles
 from .grid import align_with_up, check_see_behind
 
 
-def crop_field_of_view(grid, agent, height, width):
+def crop_field_of_view(grid: GridState, agent: AgentState, height: int, width: int) -> jax.Array:
     # TODO: assert height and width are odd and >= 3
     # TODO: in theory we don't need padding from all 4 sides, only for out of bounds sides
     grid = jnp.pad(
@@ -32,7 +33,7 @@ def crop_field_of_view(grid, agent, height, width):
     return fov_crop
 
 
-def transparent_field_of_view(grid, agent, height, width):
+def transparent_field_of_view(grid: GridState, agent: AgentState, height: int, width: int) -> jax.Array:
     fov_grid = crop_field_of_view(grid, agent, height, width)
     fov_grid = align_with_up(fov_grid, agent.direction)
 
@@ -51,7 +52,7 @@ def transparent_field_of_view(grid, agent, height, width):
 # https://github.com/Farama-Foundation/Minigrid/blob/e6f34bee70c5eb45ca9bfa2ea061cf06dd03e7b3/minigrid/core/grid.py#L291C9-L291C20 # noqa
 # but adapted to jax and transposed grid
 # WARN: only works for field of view crop aligned with UP direction, use align_with_up before!
-def generate_viz_mask_minigrid(grid):
+def generate_viz_mask_minigrid(grid: GridState) -> jax.Array:
     H, W = grid.shape[0], grid.shape[1]
     viz_mask = jnp.zeros((H, W), dtype=jnp.bool_)
     # agent position with UP alignment, always visible
@@ -104,8 +105,8 @@ def generate_viz_mask_minigrid(grid):
     return viz_mask
 
 
-# TODO: works well with unroll=16 and random actions, but very slow with PPO even with high unroll. Fix!
-def minigrid_field_of_view(grid, agent, height, width):
+# TODO: works well with unroll=16 and random actions, but very slow with PPO even with high unroll!
+def minigrid_field_of_view(grid: GridState, agent: AgentState, height: int, width: int) -> jax.Array:
     fov_grid = crop_field_of_view(grid, agent, height, width)
     fov_grid = align_with_up(fov_grid, agent.direction)
     mask = generate_viz_mask_minigrid(fov_grid)

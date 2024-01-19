@@ -1,9 +1,12 @@
+from __future__ import annotations
+
 import abc
 
 import jax
 import jax.numpy as jnp
 from flax import struct
 
+from ..types import AgentState, GridState
 from .constants import TILES_REGISTRY, Colors, Tiles
 from .grid import equal, get_neighbouring_tiles, pad_along_axis
 
@@ -13,7 +16,9 @@ MAX_RULE_ENCODING_LEN = 6 + 1  # +1 for idx
 # this is very costly, will evaluate all rules under vmap. Submit a PR if you know how to do it better!
 # In general, we need a way to select specific function/class based on ID number.
 # We can not just decode without evaluation, as then return type will be different between branches
-def check_rule(encodings, grid, agent, action, position):
+def check_rule(
+    encodings: jax.Array, grid: GridState, agent: AgentState, action: int | jax.Array, position: jax.Array
+) -> tuple[GridState, AgentState]:
     def _check(carry, encoding):
         grid, agent = carry
         grid, agent = jax.lax.switch(
@@ -44,16 +49,18 @@ def check_rule(encodings, grid, agent, action, position):
 
 class BaseRule(struct.PyTreeNode):
     @abc.abstractmethod
-    def __call__(self, grid, agent, action, position):
+    def __call__(
+        self, grid: GridState, agent: AgentState, action: int | jax.Array, position: jax.Array
+    ) -> tuple[GridState, AgentState]:
         ...
 
     @classmethod
     @abc.abstractmethod
-    def decode(cls, encoding):
+    def decode(cls, encoding: jax.Array) -> BaseRule:
         ...
 
     @abc.abstractmethod
-    def encode(self):
+    def encode(self) -> jax.Array:
         ...
 
 

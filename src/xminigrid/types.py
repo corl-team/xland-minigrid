@@ -1,8 +1,7 @@
-from typing import TypeAlias
-
 import jax
 import jax.numpy as jnp
 from flax import struct
+from typing_extensions import TypeAlias
 
 from .core.constants import TILES_REGISTRY, Colors, Tiles
 
@@ -14,6 +13,7 @@ class RuleSet(struct.PyTreeNode):
 
 
 GridState: TypeAlias = jax.Array
+Tile: TypeAlias = jax.Array
 
 
 class AgentState(struct.PyTreeNode):
@@ -30,7 +30,7 @@ class State(struct.PyTreeNode):
     key: jax.random.PRNGKey
     step_num: jax.Array
 
-    grid: jax.Array
+    grid: GridState
     agent: AgentState
     goal_encoding: jax.Array
     rule_encoding: jax.Array
@@ -39,9 +39,9 @@ class State(struct.PyTreeNode):
 
 
 class StepType(jnp.uint8):
-    FIRST: int = jnp.asarray(0, dtype=jnp.uint8)
-    MID: int = jnp.asarray(1, dtype=jnp.uint8)
-    LAST: int = jnp.asarray(2, dtype=jnp.uint8)
+    FIRST: jax.Array = jnp.asarray(0, dtype=jnp.uint8)
+    MID: jax.Array = jnp.asarray(1, dtype=jnp.uint8)
+    LAST: jax.Array = jnp.asarray(2, dtype=jnp.uint8)
 
 
 class TimeStep(struct.PyTreeNode):

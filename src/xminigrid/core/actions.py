@@ -1,17 +1,23 @@
+from __future__ import annotations
+
 import jax
 import jax.numpy as jnp
+from typing_extensions import TypeAlias
 
+from ..types import AgentState, GridState
 from .constants import DIRECTIONS, TILES_REGISTRY, Colors, Tiles
 from .grid import check_can_put, check_pickable, check_walkable, equal
 
+ActionOutput: TypeAlias = tuple[GridState, AgentState, jax.Array]
 
-def _move(position, direction):
+
+def _move(position: jax.Array, direction: jax.Array) -> jax.Array:
     direction = jax.lax.dynamic_index_in_dim(DIRECTIONS, direction, keepdims=False)
     new_position = position + direction
     return new_position
 
 
-def move_forward(grid, agent):
+def move_forward(grid: GridState, agent: AgentState) -> ActionOutput:
     next_position = jnp.clip(
         _move(agent.position, agent.direction),
         a_min=jnp.array((0, 0)),
@@ -27,19 +33,19 @@ def move_forward(grid, agent):
     return grid, new_agent, new_agent.position
 
 
-def turn_clockwise(grid, agent):
+def turn_clockwise(grid: GridState, agent: AgentState) -> ActionOutput:
     new_direction = (agent.direction + 1) % 4
     new_agent = agent.replace(direction=new_direction)
     return grid, new_agent, agent.position
 
 
-def turn_counterclockwise(grid, agent):
+def turn_counterclockwise(grid: GridState, agent: AgentState) -> ActionOutput:
     new_direction = (agent.direction - 1) % 4
     new_agent = agent.replace(direction=new_direction)
     return grid, new_agent, agent.position
 
 
-def pick_up(grid, agent):
+def pick_up(grid: GridState, agent: AgentState) -> ActionOutput:
     next_position = _move(agent.position, agent.direction)
 
     is_pickable = check_pickable(grid, next_position)
@@ -61,7 +67,7 @@ def pick_up(grid, agent):
     return new_grid, new_agent, next_position
 
 
-def put_down(grid, agent):
+def put_down(grid: GridState, agent: AgentState) -> ActionOutput:
     next_position = _move(agent.position, agent.direction)
 
     can_put = check_can_put(grid, next_position)
@@ -78,7 +84,7 @@ def put_down(grid, agent):
 
 
 # TODO: may be this should be open_door action? toggle is too general and box is not supported yet
-def toggle(grid, agent):
+def toggle(grid: GridState, agent: AgentState) -> ActionOutput:
     next_position = _move(agent.position, agent.direction)
     next_tile = grid[next_position[0], next_position[1]]
 
@@ -103,7 +109,7 @@ def toggle(grid, agent):
     return new_grid, agent, next_position
 
 
-def take_action(grid, agent, action):
+def take_action(grid: GridState, agent: AgentState, action: int) -> ActionOutput:
     # This will evaluate all actions.
     # Can we fix this and choose only one function? It'll speed everything up dramatically.
     actions = (

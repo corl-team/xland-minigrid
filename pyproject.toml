@@ -2,7 +2,7 @@
 name = "xminigrid"
 description = "JAX-accelerated meta-reinforcement learning environments inspired by XLand and MiniGrid"
 readme = "README.md"
-requires-python =">=3.8"
+requires-python =">=3.9"
 license = {file = "LICENSE"}
 authors = [
   {name = "Alexander Nikulin", email = "a.p.nikulin@tinkoff.ai"},
@@ -26,7 +26,6 @@ classifiers = [
     "Natural Language :: English",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
@@ -43,7 +42,8 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "ruff>=0.1.6",
-    "pre-commit>=3.3.3"
+    "pre-commit>=3.3.3",
+    "pyright>=1.1.347",
 ]
 
 baselines = [
@@ -87,3 +87,16 @@ skip-magic-trailing-comma = false
 [tool.ruff.isort]
 # see https://github.com/astral-sh/ruff/issues/8571
 known-third-party = ["wandb"]
+
+
+[tool.pyright]
+include = ["src/xminigrid"]
+exclude = [
+    "**/node_modules",
+    "**/__pycache__",
+]
+
+reportMissingImports = true
+reportMissingTypeStubs = false
+pythonVersion = "3.10"
+pythonPlatform = "All"
