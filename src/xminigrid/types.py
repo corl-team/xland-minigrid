@@ -1,3 +1,5 @@
+from dataclasses import field
+
 import jax
 import jax.numpy as jnp
 from flax import struct
@@ -17,9 +19,9 @@ Tile: TypeAlias = jax.Array
 
 
 class AgentState(struct.PyTreeNode):
-    position: jax.Array = jnp.asarray((0, 0))
-    direction: jax.Array = jnp.asarray(0)
-    pocket: jax.Array = TILES_REGISTRY[Tiles.EMPTY, Colors.EMPTY]
+    position: jax.Array = field(default_factory=lambda: jnp.asarray((0, 0)))
+    direction: jax.Array = field(default_factory=lambda: jnp.asarray(0))
+    pocket: jax.Array = field(default_factory=lambda: TILES_REGISTRY[Tiles.EMPTY, Colors.EMPTY])
 
 
 class EnvCarry(struct.PyTreeNode):
