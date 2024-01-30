@@ -38,6 +38,11 @@ def _render_floor(img, color):
     # draw tile
     fill_coords(img, point_in_rect(0.031, 1, 0.031, 1), COLORS_MAP[color] / 2)
 
+    # # other grid lines (was used for paper visualizations)
+    # fill_coords(img, point_in_rect(1 - 0.031, 1, 0, 1), (100, 100, 100))
+    # fill_coords(img, point_in_rect(0, 1, 1 - 0.031, 1), (100, 100, 100))
+    #
+
 
 def _render_wall(img, color):
     fill_coords(img, point_in_rect(0, 1, 0, 1), COLORS_MAP[color])
@@ -91,6 +96,10 @@ def _render_goal(img, color):
     fill_coords(img, point_in_rect(0, 1, 0, 0.031), (100, 100, 100))
     # draw tile
     fill_coords(img, point_in_rect(0.031, 1, 0.031, 1), COLORS_MAP[color])
+
+    # # other grid lines (was used for paper visualizations)
+    # fill_coords(img, point_in_rect(1 - 0.031, 1, 0, 1), (100, 100, 100))
+    # fill_coords(img, point_in_rect(0, 1, 1 - 0.031, 1), (100, 100, 100))
 
 
 def _render_key(img, color):

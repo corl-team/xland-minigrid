@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import importlib
 from dataclasses import dataclass, field
-from typing import Type
+from typing import Any, Type
 
 from .environment import Environment, EnvParams
 
@@ -20,7 +22,7 @@ def register(
     id: str,
     entry_point: str,
     **kwargs,
-):
+) -> None:
     if id in _REGISTRY:
         raise ValueError("Environment with such id is already registered. Please choose another one.")
 
@@ -39,7 +41,7 @@ def load(name: str) -> Type[Environment]:
     return env_constructor
 
 
-def make(id: str, **kwargs) -> tuple[Environment, EnvParams]:
+def make(id: str, **kwargs: Any) -> tuple[Environment, EnvParams]:
     if id not in _REGISTRY:
         raise ValueError(f"Unregistered environment. Available environments: {', '.join(registered_environments())}")
 
@@ -53,5 +55,5 @@ def make(id: str, **kwargs) -> tuple[Environment, EnvParams]:
     return env, env_params
 
 
-def registered_environments():
+def registered_environments() -> tuple[str, ...]:
     return tuple(_REGISTRY.keys())

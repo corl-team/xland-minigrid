@@ -40,6 +40,7 @@ def check_goal(
     return check
 
 
+# should I inherit from abc.ABC?
 class BaseGoal(struct.PyTreeNode):
     @abc.abstractmethod
     def __call__(self, grid: GridState, agent: AgentState, action: int | jax.Array, position: jax.Array) -> jax.Array:

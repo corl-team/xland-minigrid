@@ -2,9 +2,84 @@ from .benchmarks import load_benchmark, registered_benchmarks
 from .registration import make, register, registered_environments
 
 # TODO: add __all__
-__version__ = "0.5.0"
+__version__ = "0.5.1"
 
 # ---------- XLand-MiniGrid environments ----------
+
+# WARN: TMP, only for FPS measurements
+# register(
+#     id="MiniGrid-1Rules",
+#     entry_point="xminigrid.envs.xland_tmp:XLandMiniGrid",
+#     num_rules=1,
+#     height=16,
+#     width=16,
+# )
+#
+# register(
+#     id="MiniGrid-3Rules",
+#     entry_point="xminigrid.envs.xland_tmp:XLandMiniGrid",
+#     num_rules=2,
+#     height=16,
+#     width=16,
+# )
+#
+# register(
+#     id="MiniGrid-6Rules",
+#     entry_point="xminigrid.envs.xland_tmp:XLandMiniGrid",
+#     num_rules=6,
+#     height=16,
+#     width=16,
+# )
+#
+# register(
+#     id="MiniGrid-12Rules",
+#     entry_point="xminigrid.envs.xland_tmp:XLandMiniGrid",
+#     num_rules=12,
+#     height=16,
+#     width=16,
+# )
+#
+# register(
+#     id="MiniGrid-24Rules",
+#     entry_point="xminigrid.envs.xland_tmp:XLandMiniGrid",
+#     num_rules=24,
+#     height=16,
+#     width=16,
+# )
+
+# register(
+#     id="XLand-MiniGrid-R1-8x8",
+#     entry_point="xminigrid.envs.xland:XLandMiniGrid",
+#     grid_type="R1",
+#     height=8,
+#     width=8,
+# )
+#
+# register(
+#     id="XLand-MiniGrid-R1-16x16",
+#     entry_point="xminigrid.envs.xland:XLandMiniGrid",
+#     grid_type="R1",
+#     height=16,
+#     width=16,
+# )
+#
+# register(
+#     id="XLand-MiniGrid-R1-32x32",
+#     entry_point="xminigrid.envs.xland:XLandMiniGrid",
+#     grid_type="R1",
+#     height=32,
+#     width=32,
+# )
+#
+# register(
+#     id="XLand-MiniGrid-R1-64x64",
+#     entry_point="xminigrid.envs.xland:XLandMiniGrid",
+#     grid_type="R1",
+#     height=64,
+#     width=64,
+# )
+
+
 # TODO: reconsider grid sizes and time limits after the benchmarks are generated.
 #  Should be enough space for initial tiles even in the hardest setting
 register(
@@ -47,7 +122,6 @@ register(
     height=13,
     width=13,
 )
-
 
 register(
     id="XLand-MiniGrid-R2-17x17",

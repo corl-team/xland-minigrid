@@ -1,7 +1,8 @@
 import jax
+from jax.random import KeyArray
 
 from .environment import Environment, EnvParams
-from .types import State, TimeStep
+from .types import TimeStep
 
 
 class Wrapper(Environment):
@@ -17,10 +18,10 @@ class Wrapper(Environment):
     def time_limit(self, params: EnvParams) -> int:
         return self._env.time_limit(params)
 
-    def generate_problem(self, params: EnvParams, key: jax.Array) -> State:
-        return self._env.generate_problem(params, key)
+    # def _generate_problem(self, params: EnvParams, key: jax.Array) -> State:
+    #     return self._env._generate_problem(params, key)
 
-    def reset(self, params: EnvParams, key: jax.Array) -> TimeStep:
+    def reset(self, params: EnvParams, key: KeyArray) -> TimeStep:
         return self._env.reset(params, key)
 
     def step(self, params: EnvParams, timestep: TimeStep, action: int) -> TimeStep:
@@ -32,7 +33,7 @@ class Wrapper(Environment):
 
 # gym and gymnasium style reset (on the same step with termination)
 class GymAutoResetWrapper(Wrapper):
-    def __auto_reset(self, params, timestep):
+    def __auto_reset(self, params: EnvParams, timestep: TimeStep) -> TimeStep:
         key, _ = jax.random.split(timestep.state.key)
         reset_timestep = self._env.reset(params, key)
 

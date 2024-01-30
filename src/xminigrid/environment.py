@@ -1,6 +1,12 @@
+from __future__ import annotations
+
+from typing import Any
+
 import jax
 import jax.numpy as jnp
+import numpy as np
 from flax import struct
+from jax.random import KeyArray
 
 from .core.actions import take_action
 from .core.constants import NUM_ACTIONS, NUM_LAYERS
@@ -23,24 +29,25 @@ class EnvParams(struct.PyTreeNode):
     render_mode: str = struct.field(pytree_node=False, default="rgb_array")
 
 
+# TODO: add generic type hints (on env params)
 class Environment:
-    def default_params(self, **kwargs) -> EnvParams:
+    def default_params(self, **kwargs: Any) -> EnvParams:
         return EnvParams().replace(**kwargs)
 
     def num_actions(self, params: EnvParams) -> int:
         return int(NUM_ACTIONS)
 
     def observation_shape(self, params: EnvParams) -> tuple[int, int, int]:
-        return (params.view_size, params.view_size, NUM_LAYERS)
+        return params.view_size, params.view_size, NUM_LAYERS
 
     # TODO: NOT sure that this should be hardcoded like that...
     def time_limit(self, params: EnvParams) -> int:
         return 3 * params.height * params.width
 
-    def _generate_problem(self, params: EnvParams, key: jax.Array) -> State:
+    def _generate_problem(self, params: EnvParams, key: KeyArray) -> State:
         return NotImplemented
 
-    def reset(self, params: EnvParams, key: jax.Array) -> TimeStep:
+    def reset(self, params: EnvParams, key: KeyArray) -> TimeStep:
         state = self._generate_problem(params, key)
         timestep = TimeStep(
             state=state,
@@ -81,7 +88,7 @@ class Environment:
         )
         return timestep
 
-    def render(self, params: EnvParams, timestep: TimeStep):
+    def render(self, params: EnvParams, timestep: TimeStep) -> np.ndarray | str:
         if params.render_mode == "rgb_array":
             return rgb_render(timestep.state.grid, timestep.state.agent, params.view_size)
         elif params.render_mode == "rich_text":

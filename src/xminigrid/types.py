@@ -1,6 +1,7 @@
 import jax
 import jax.numpy as jnp
 from flax import struct
+from jax.random import KeyArray
 from typing_extensions import TypeAlias
 
 from .core.constants import TILES_REGISTRY, Colors, Tiles
@@ -27,7 +28,7 @@ class EnvCarry(struct.PyTreeNode):
 
 
 class State(struct.PyTreeNode):
-    key: jax.random.PRNGKey
+    key: KeyArray
     step_num: jax.Array
 
     grid: GridState

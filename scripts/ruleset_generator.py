@@ -227,9 +227,6 @@ def sample_ruleset(
         # you can add other field if needed, just copy-paste this file!
         # saving counts, as later they will be padded to the same size
         "num_rules": len([r for r in rules if not isinstance(r, EmptyRule)]),
-        "num_init_tiles": len(init_tiles),
-        "max_chain_depth": num_levels,
-        "num_distractor_rules": num_distractor_rules,
     }
 
 
@@ -281,13 +278,11 @@ if __name__ == "__main__":
                 "rules": jnp.vstack([r.encode() for r in ruleset["rules"]]),
                 "init_tiles": jnp.array(ruleset["init_tiles"], dtype=jnp.uint8),
                 "num_rules": jnp.asarray(ruleset["num_rules"], dtype=jnp.uint8),
-                "num_init_tiles": jnp.asarray(ruleset["num_init_tiles"], dtype=jnp.uint8),
-                "max_chain_depth": jnp.asarray(ruleset["max_chain_depth"], dtype=jnp.uint8),
-                "num_distractor_rules": jnp.asarray(ruleset["num_distractor_rules"], dtype=jnp.uint8),
             }
         )
         unique_rulesets_encodings.add(encode(ruleset))
 
+    del unique_rulesets_encodings
     # concatenating padded rulesets, for convenient sampling in jax
     # as in jax we can not retrieve single item from the list/pytree under jit
     # also all rulesets in one benchmark should have same shapes to work under jit
@@ -306,9 +301,6 @@ if __name__ == "__main__":
         "rules": jnp.vstack([pad_along_axis(r["rules"], pad_to=max_rules)[None, ...] for r in rulesets]),
         "init_tiles": jnp.vstack([pad_along_axis(r["init_tiles"], pad_to=max_tiles)[None, ...] for r in rulesets]),
         "num_rules": jnp.vstack([r["num_rules"] for r in rulesets]),
-        "num_init_tiles": jnp.vstack([r["num_init_tiles"] for r in rulesets]),
-        "max_chain_depth": jnp.vstack([r["max_chain_depth"] for r in rulesets]),
-        "num_distractor_rules": jnp.vstack([r["num_distractor_rules"] for r in rulesets]),
     }
     print("Saving...")
     save_bz2_pickle(concat_rulesets, args.save_path, protocol=-1)

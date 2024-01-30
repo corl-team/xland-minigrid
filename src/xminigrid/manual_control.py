@@ -3,13 +3,17 @@ import argparse
 import jax
 import numpy as np
 import pygame
+import pygame.freetype
+from pygame.event import Event
 
 import xminigrid
 from xminigrid.wrappers import GymAutoResetWrapper
 
+from .environment import Environment, EnvParams
+
 
 class ManualControl:
-    def __init__(self, env, env_params):
+    def __init__(self, env: Environment, env_params: EnvParams):
         self.env = env
         self.env_params = env_params
 
@@ -25,7 +29,9 @@ class ManualControl:
         self.screen_size = 640
         self.closed = False
 
-    def render(self):
+    def render(self) -> None:
+        assert self.timestep is not None
+
         img = self.env.render(self.env_params, self.timestep)
         # [h, w, c] -> [w, h, c]
         img = np.transpose(img, axes=(1, 0, 2))
@@ -57,7 +63,7 @@ class ManualControl:
         font = pygame.freetype.SysFont(pygame.font.get_default_font(), font_size)
         text_rect = font.get_rect(text, size=font_size)
         text_rect.center = bg.get_rect().center
-        text_rect.y = bg.get_height() - font_size * 1.5
+        text_rect.y = int(bg.get_height() - font_size * 1.5)
         font.render_to(bg, text_rect, text, size=font_size)
 
         self.window.blit(bg, (0, 0))
@@ -65,7 +71,7 @@ class ManualControl:
         self.clock.tick(10)
         pygame.display.flip()
 
-    def start(self):
+    def start(self) -> None:
         self.reset()
 
         """Start the window display with blocking event loop"""
@@ -78,7 +84,7 @@ class ManualControl:
                     event.key = pygame.key.name(int(event.key))
                     self.key_handler(event)
 
-    def step(self, action):
+    def step(self, action: int) -> None:
         self.timestep = self._step(self.env_params, self.timestep, action)
         print(
             "StepType: ",
@@ -90,7 +96,7 @@ class ManualControl:
         )
         self.render()
 
-    def reset(self):
+    def reset(self) -> None:
         print("Reset!")
         self._key, reset_key = jax.random.split(self._key)
 
@@ -105,7 +111,7 @@ class ManualControl:
             self.timestep.reward,
         )
 
-    def key_handler(self, event):
+    def key_handler(self, event: Event) -> None:
         key: str = event.key
         print("pressed", key)
 
@@ -127,7 +133,7 @@ class ManualControl:
         else:
             print(key)
 
-    def close(self):
+    def close(self) -> None:
         if self.window:
             pygame.quit()
 
@@ -135,10 +141,16 @@ class ManualControl:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--env-id", type=str, default="MiniGrid-Empty-5x5", choices=xminigrid.registered_environments())
+    parser.add_argument("--benchmark-id", type=str, default="trivial-1m", choices=xminigrid.registered_benchmarks())
+    parser.add_argument("--ruleset-id", type=int, default=0)
 
     args = parser.parse_args()
     env, env_params = xminigrid.make(args.env_id)
     env = GymAutoResetWrapper(env)
+
+    if "XLand" in args.env_id:
+        bench = xminigrid.load_benchmark(args.benchmark_id)
+        env_params = env_params.replace(ruleset=bench.get_ruleset(args.ruleset_id))
 
     control = ManualControl(env=env, env_params=env_params)
     control.start()

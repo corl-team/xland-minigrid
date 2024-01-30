@@ -4,6 +4,7 @@ from typing import Callable
 
 import jax
 import jax.numpy as jnp
+from jax.random import KeyArray
 
 from ..types import GridState, Tile
 from .constants import FREE_TO_PUT_DOWN, LOS_BLOCKING, PICKABLE, TILES_REGISTRY, WALKABLE, Colors, Tiles
@@ -158,7 +159,7 @@ def coordinates_mask(grid: GridState, address: tuple[int, int], comparison_fn: C
     return mask
 
 
-def sample_coordinates(key: jax.Array, grid: GridState, num: int, mask: jax.Array | None = None) -> jax.Array:
+def sample_coordinates(key: KeyArray, grid: GridState, num: int, mask: jax.Array | None = None) -> jax.Array:
     if mask is None:
         mask = jnp.ones((grid.shape[0], grid.shape[1]), dtype=jnp.bool_)
 
@@ -174,7 +175,7 @@ def sample_coordinates(key: jax.Array, grid: GridState, num: int, mask: jax.Arra
     return coords
 
 
-def sample_direction(key: jax.Array) -> jax.Array:
+def sample_direction(key: KeyArray) -> jax.Array:
     return jax.random.randint(key, shape=(), minval=0, maxval=4)
 
 
