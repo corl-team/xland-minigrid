@@ -1,5 +1,3 @@
-from dataclasses import field
-
 import jax
 import jax.numpy as jnp
 from flax import struct
