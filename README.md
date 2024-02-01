@@ -7,9 +7,6 @@
     <a href="https://badge.fury.io/py/xminigrid">
         <img src="https://badge.fury.io/py/xminigrid.svg"/>
     </a>
-    <a href="https://badge.fury.io/py/xminigrid">
-        <img src="https://img.shields.io/pypi/dm/xminigrid?color=yellow&label=Downloads"/>
-    </a>
     <a href="https://github.com/corl-team/xland-minigrid/main/LICENSE">
         <img src="https://img.shields.io/badge/license-Apache_2.0-blue"/>
     </a>
@@ -23,6 +20,13 @@
       <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
     </a>
 </p>
+
+
+[//]: # (    <a href="https://badge.fury.io/py/xminigrid">)
+
+[//]: # (        <img src="https://img.shields.io/pypi/dm/xminigrid?color=yellow&label=Downloads"/>)
+
+[//]: # (    </a>)
 
 ![img](figures/readme-main-img.png)
 
