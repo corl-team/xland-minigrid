@@ -1,7 +1,6 @@
 import jax
 import jax.numpy as jnp
 from flax import struct
-from jax.random import KeyArray
 
 from ..core.constants import TILES_REGISTRY, Colors, Tiles
 from ..core.goals import EmptyGoal
@@ -18,7 +17,7 @@ from ..core.grid import (
 )
 from ..core.rules import EmptyRule
 from ..environment import Environment, EnvParams
-from ..types import AgentState, EnvCarry, RuleSet, State
+from ..types import AgentState, EnvCarry, GridState, RuleSet, State
 
 _empty_ruleset = RuleSet(
     goal=EmptyGoal().encode(),
@@ -43,12 +42,12 @@ _allowed_colors = jnp.array(
 
 # helper functions to generate various maps, inspired by the common minigrid layouts
 # TODO: all worlds should be square
-def generate_room(key: KeyArray, height, width):
+def generate_room(key: jax.Array, height: int, width: int) -> tuple[jax.Array, GridState]:
     grid = room(height, width)
     return key, grid
 
 
-def generate_two_rooms(key: KeyArray, height, width):
+def generate_two_rooms(key: jax.Array, height: int, width: int) -> tuple[jax.Array, GridState]:
     key, color_key, door_key = jax.random.split(key, num=3)
 
     color = jax.random.choice(color_key, _allowed_colors)
@@ -60,7 +59,7 @@ def generate_two_rooms(key: KeyArray, height, width):
     return key, grid
 
 
-def generate_four_rooms(key: KeyArray, height, width):
+def generate_four_rooms(key: jax.Array, height: int, width: int) -> tuple[jax.Array, GridState]:
     key, doors_key, colors_key = jax.random.split(key, num=3)
 
     doors_offsets = jax.random.randint(doors_key, shape=(4,), minval=1, maxval=height // 2)
@@ -75,7 +74,7 @@ def generate_four_rooms(key: KeyArray, height, width):
     return key, grid
 
 
-def generate_six_rooms(key: KeyArray, height, width):
+def generate_six_rooms(key: jax.Array, height: int, width: int) -> tuple[jax.Array, GridState]:
     key, colors_key = jax.random.split(key)
 
     grid = room(height, width)
@@ -104,7 +103,7 @@ def generate_six_rooms(key: KeyArray, height, width):
     return key, grid
 
 
-def generate_nine_rooms(key: KeyArray, height, width):
+def generate_nine_rooms(key: jax.Array, height: int, width: int) -> tuple[jax.Array, GridState]:
     # valid sizes should follow 3 * x + 4: 7, 10, 13, 16, 19, 22, 25, 28, 31, ...
     # (size - 4) % 3 == 0
     key, doors_key, colors_key = jax.random.split(key, num=3)
@@ -135,25 +134,25 @@ def generate_nine_rooms(key: KeyArray, height, width):
     return key, grid
 
 
-class XLandMiniGridEnvOptions(EnvParams):
+class XLandEnvParams(EnvParams):
     # you can vmap on rulesets for multi-task/meta learning
     ruleset: RuleSet = struct.field(pytree_node=True, default=_empty_ruleset)
     # experimental (can not vmap on it)
     grid_type: int = struct.field(pytree_node=False, default="1R")
 
 
-class XLandMiniGrid(Environment):
-    def default_params(self, **kwargs) -> EnvParams:
-        default_params = XLandMiniGridEnvOptions(view_size=5)
+class XLandMiniGrid(Environment[XLandEnvParams]):
+    def default_params(self, **kwargs) -> XLandEnvParams:
+        default_params = XLandEnvParams(view_size=5)
         return default_params.replace(**kwargs)
 
-    def time_limit(self, params: XLandMiniGridEnvOptions) -> int:
+    def time_limit(self, params: XLandEnvParams) -> int:
         # this is just a heuristic to prevent brute force in one episode,
         # agent need to remember what he tried in previous episodes.
         # If this is too small, change it or increase number of trials (these are not equivalent).
         return 3 * (params.height * params.width)
 
-    def _generate_problem(self, params: XLandMiniGridEnvOptions, key: KeyArray) -> State:
+    def _generate_problem(self, params: XLandEnvParams, key: jax.Array) -> State:
         # WARN: we can make this compatible with jit (to vmap on different layouts during training),
         # but it will probably be very costly, as lax.switch will generate all layouts during reset under vmap
         # TODO: experiment with this under jit, does it possible to make it jit-compatible without overhead?

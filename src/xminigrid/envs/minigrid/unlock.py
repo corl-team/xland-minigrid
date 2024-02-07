@@ -22,9 +22,9 @@ _allowed_colors = jnp.array(
 _rule_encoding = EmptyRule().encode()[None, ...]
 
 
-class Unlock(Environment):
+class Unlock(Environment[EnvParams]):
     def default_params(self, **kwargs) -> EnvParams:
-        default_params = super().default_params(height=6, width=11)
+        default_params = EnvParams(height=6, width=11)
         default_params = default_params.replace(**kwargs)
         return default_params
 

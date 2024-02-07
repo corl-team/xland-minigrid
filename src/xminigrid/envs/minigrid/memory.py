@@ -8,7 +8,7 @@ from ...core.grid import equal, horizontal_line, rectangle, room, vertical_line
 from ...core.observation import transparent_field_of_view
 from ...core.rules import EmptyRule
 from ...environment import Environment, EnvParams
-from ...types import AgentState, EnvCarry, State, StepType, TimeStep
+from ...types import AgentState, EnvCarry, IntOrArray, State, StepType, TimeStep
 
 _goal_encoding = EmptyGoal().encode()
 _rule_encoding = EmptyRule().encode()[None, ...]
@@ -33,9 +33,9 @@ class MemoryEnvCarry(EnvCarry):
 
 
 # TODO: Random corridor length is a bit problematic due to the dynamic slicing.
-class Memory(Environment):
+class Memory(Environment[EnvParams]):
     def default_params(self, **kwargs) -> EnvParams:
-        default_params = super().default_params(height=7, width=13, view_size=3)
+        default_params = EnvParams(height=7, width=13, view_size=3)
         default_params = default_params.replace(**kwargs)
         return default_params
 
@@ -101,7 +101,7 @@ class Memory(Environment):
         )
         return state
 
-    def step(self, params: EnvParams, timestep: TimeStep, action: int) -> TimeStep:
+    def step(self, params: EnvParams, timestep: TimeStep, action: IntOrArray) -> TimeStep:
         # disabling pick_up action
         action = jax.lax.select(jnp.equal(action, 3), 5, action)
         new_grid, new_agent, _ = take_action(timestep.state.grid, timestep.state.agent, action)

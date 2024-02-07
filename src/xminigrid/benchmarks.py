@@ -10,7 +10,6 @@ import jax
 import jax.numpy as jnp
 import jax.tree_util as jtu
 from flax import struct
-from jax.random import KeyArray
 from tqdm.auto import tqdm
 
 from .types import RuleSet
@@ -43,11 +42,11 @@ class Benchmark(struct.PyTreeNode):
     def get_ruleset(self, ruleset_id: int | jax.Array) -> RuleSet:
         return get_ruleset(self.goals, self.rules, self.init_tiles, ruleset_id)
 
-    def sample_ruleset(self, key: KeyArray) -> RuleSet:
+    def sample_ruleset(self, key: jax.Array) -> RuleSet:
         ruleset_id = jax.random.randint(key, shape=(), minval=0, maxval=self.num_rulesets())
         return self.get_ruleset(ruleset_id)
 
-    def shuffle(self, key: KeyArray) -> Benchmark:
+    def shuffle(self, key: jax.Array) -> Benchmark:
         idxs = jax.random.permutation(key, jnp.arange(len(self.num_rules)))
         return jtu.tree_map(lambda a: a[idxs], self)
 

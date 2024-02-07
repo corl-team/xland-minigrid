@@ -1,7 +1,8 @@
+from typing import Union
+
 import jax
 import jax.numpy as jnp
 from flax import struct
-from jax.random import KeyArray
 from typing_extensions import TypeAlias
 
 from .core.constants import TILES_REGISTRY, Colors, Tiles
@@ -15,6 +16,7 @@ class RuleSet(struct.PyTreeNode):
 
 GridState: TypeAlias = jax.Array
 Tile: TypeAlias = jax.Array
+IntOrArray: TypeAlias = Union[int, jax.Array]
 
 
 class AgentState(struct.PyTreeNode):
@@ -28,7 +30,7 @@ class EnvCarry(struct.PyTreeNode):
 
 
 class State(struct.PyTreeNode):
-    key: KeyArray
+    key: jax.Array
     step_num: jax.Array
 
     grid: GridState

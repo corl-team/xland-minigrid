@@ -1,39 +1,38 @@
 import jax
-from jax.random import KeyArray
 
-from .environment import Environment, EnvParams
-from .types import TimeStep
+from .environment import Environment, EnvParamsT
+from .types import IntOrArray, State, TimeStep
 
 
-class Wrapper(Environment):
-    def __init__(self, env: Environment):
+class Wrapper(Environment[EnvParamsT]):
+    def __init__(self, env: Environment[EnvParamsT]):
         self._env = env
 
     # Question: what if wrapper adds new parameters to the dataclass?
     # Solution: do this after applying the wrapper:
     #   env_params = wrapped_env.default_params(**dataclasses.asdict(original_params))
-    def default_params(self, **kwargs) -> EnvParams:
+    def default_params(self, **kwargs) -> EnvParamsT:
         return self._env.default_params(**kwargs)
 
-    def time_limit(self, params: EnvParams) -> int:
+    def time_limit(self, params: EnvParamsT) -> int:
         return self._env.time_limit(params)
 
-    # def _generate_problem(self, params: EnvParams, key: jax.Array) -> State:
-    #     return self._env._generate_problem(params, key)
+    def _generate_problem(self, params: EnvParamsT, key: jax.Array) -> State:
+        return self._env._generate_problem(params, key)
 
-    def reset(self, params: EnvParams, key: KeyArray) -> TimeStep:
+    def reset(self, params: EnvParamsT, key: jax.Array) -> TimeStep:
         return self._env.reset(params, key)
 
-    def step(self, params: EnvParams, timestep: TimeStep, action: int) -> TimeStep:
+    def step(self, params: EnvParamsT, timestep: TimeStep, action: IntOrArray) -> TimeStep:
         return self._env.step(params, timestep, action)
 
-    def render(self, params: EnvParams, timestep: TimeStep):
+    def render(self, params: EnvParamsT, timestep: TimeStep):
         return self._env.render(params, timestep)
 
 
 # gym and gymnasium style reset (on the same step with termination)
 class GymAutoResetWrapper(Wrapper):
-    def __auto_reset(self, params: EnvParams, timestep: TimeStep) -> TimeStep:
+    def __auto_reset(self, params, timestep):
         key, _ = jax.random.split(timestep.state.key)
         reset_timestep = self._env.reset(params, key)
 
@@ -44,7 +43,7 @@ class GymAutoResetWrapper(Wrapper):
         return timestep
 
     # TODO: add last_obs somewhere in the timestep? add extras like in Jumanji?
-    def step(self, params: EnvParams, timestep: TimeStep, action: int) -> TimeStep:
+    def step(self, params, timestep, action):
         timestep = self._env.step(params, timestep, action)
         timestep = jax.lax.cond(
             timestep.last(),
@@ -56,7 +55,7 @@ class GymAutoResetWrapper(Wrapper):
 
 # dm_env and envpool style reset (on the next step after termination)
 class DmEnvAutoResetWrapper(Wrapper):
-    def step(self, params: EnvParams, timestep: TimeStep, action: int) -> TimeStep:
+    def step(self, params, timestep, action):
         timestep = jax.lax.cond(
             timestep.last(),
             lambda: self._env.reset(params, timestep.state.key),

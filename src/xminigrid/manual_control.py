@@ -9,11 +9,11 @@ from pygame.event import Event
 import xminigrid
 from xminigrid.wrappers import GymAutoResetWrapper
 
-from .environment import Environment, EnvParams
+from .environment import Environment, EnvParamsT
 
 
 class ManualControl:
-    def __init__(self, env: Environment, env_params: EnvParams):
+    def __init__(self, env: Environment[EnvParamsT], env_params: EnvParamsT):
         self.env = env
         self.env_params = env_params
 

@@ -41,7 +41,7 @@ class PlaygroundEnvParams(EnvParams):
     num_objects: int = struct.field(pytree_node=False, default=12)
 
 
-class Playground(Environment):
+class Playground(Environment[PlaygroundEnvParams]):
     def default_params(self, **kwargs) -> PlaygroundEnvParams:
         return PlaygroundEnvParams(height=19, width=19).replace(**kwargs)
 

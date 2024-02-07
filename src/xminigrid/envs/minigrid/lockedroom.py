@@ -26,9 +26,9 @@ _allowed_colors = jnp.array(
 )
 
 
-class LockedRoom(Environment):
+class LockedRoom(Environment[EnvParams]):
     def default_params(self, **kwargs) -> EnvParams:
-        default_params = super().default_params(height=19, width=19)
+        default_params = EnvParams(height=19, width=19)
         default_params = default_params.replace(**kwargs)
         return default_params
 

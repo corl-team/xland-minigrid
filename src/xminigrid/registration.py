@@ -4,7 +4,7 @@ import importlib
 from dataclasses import dataclass, field
 from typing import Any, Type
 
-from .environment import Environment, EnvParams
+from .environment import Environment, EnvParamsT
 
 
 @dataclass
@@ -41,7 +41,7 @@ def load(name: str) -> Type[Environment]:
     return env_constructor
 
 
-def make(id: str, **kwargs: Any) -> tuple[Environment, EnvParams]:
+def make(id: str, **kwargs: Any) -> tuple[Environment[EnvParamsT], EnvParamsT]:
     if id not in _REGISTRY:
         raise ValueError(f"Unregistered environment. Available environments: {', '.join(registered_environments())}")
 

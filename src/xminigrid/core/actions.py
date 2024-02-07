@@ -4,7 +4,7 @@ import jax
 import jax.numpy as jnp
 from typing_extensions import TypeAlias
 
-from ..types import AgentState, GridState
+from ..types import AgentState, GridState, IntOrArray
 from .constants import DIRECTIONS, TILES_REGISTRY, Colors, Tiles
 from .grid import check_can_put, check_pickable, check_walkable, equal
 
@@ -109,7 +109,7 @@ def toggle(grid: GridState, agent: AgentState) -> ActionOutput:
     return new_grid, agent, next_position
 
 
-def take_action(grid: GridState, agent: AgentState, action: int) -> ActionOutput:
+def take_action(grid: GridState, agent: AgentState, action: IntOrArray) -> ActionOutput:
     # This will evaluate all actions.
     # Can we fix this and choose only one function? It'll speed everything up dramatically.
     actions = (

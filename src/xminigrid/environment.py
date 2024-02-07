@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from typing import Any
+import abc
+from typing import Any, Generic, TypeVar
 
 import jax
 import jax.numpy as jnp
 import numpy as np
 from flax import struct
-from jax.random import KeyArray
 
 from .core.actions import take_action
 from .core.constants import NUM_ACTIONS, NUM_LAYERS
@@ -15,7 +15,7 @@ from .core.observation import transparent_field_of_view
 from .core.rules import check_rule
 from .rendering.rgb_render import render as rgb_render
 from .rendering.text_render import render as text_render
-from .types import State, StepType, TimeStep
+from .types import IntOrArray, State, StepType, TimeStep
 
 
 class EnvParams(struct.PyTreeNode):
@@ -29,25 +29,29 @@ class EnvParams(struct.PyTreeNode):
     render_mode: str = struct.field(pytree_node=False, default="rgb_array")
 
 
-# TODO: add generic type hints (on env params)
-class Environment:
-    def default_params(self, **kwargs: Any) -> EnvParams:
-        return EnvParams().replace(**kwargs)
+EnvParamsT = TypeVar("EnvParamsT", bound="EnvParams")
 
-    def num_actions(self, params: EnvParams) -> int:
+
+class Environment(abc.ABC, Generic[EnvParamsT]):
+    @abc.abstractmethod
+    def default_params(self, **kwargs: Any) -> EnvParamsT:
+        ...
+
+    def num_actions(self, params: EnvParamsT) -> int:
         return int(NUM_ACTIONS)
 
-    def observation_shape(self, params: EnvParams) -> tuple[int, int, int]:
+    def observation_shape(self, params: EnvParamsT) -> tuple[int, int, int]:
         return params.view_size, params.view_size, NUM_LAYERS
 
     # TODO: NOT sure that this should be hardcoded like that...
-    def time_limit(self, params: EnvParams) -> int:
+    def time_limit(self, params: EnvParamsT) -> int:
         return 3 * params.height * params.width
 
-    def _generate_problem(self, params: EnvParams, key: KeyArray) -> State:
-        return NotImplemented
+    @abc.abstractmethod
+    def _generate_problem(self, params: EnvParamsT, key: jax.Array) -> State:
+        ...
 
-    def reset(self, params: EnvParams, key: KeyArray) -> TimeStep:
+    def reset(self, params: EnvParamsT, key: jax.Array) -> TimeStep:
         state = self._generate_problem(params, key)
         timestep = TimeStep(
             state=state,
@@ -59,7 +63,7 @@ class Environment:
         return timestep
 
     # Why timestep + state at once, and not like in Jumanji? To be able to do autoresets in gym and envpools styles
-    def step(self, params: EnvParams, timestep: TimeStep, action: int) -> TimeStep:
+    def step(self, params: EnvParamsT, timestep: TimeStep, action: IntOrArray) -> TimeStep:
         new_grid, new_agent, changed_position = take_action(timestep.state.grid, timestep.state.agent, action)
         new_grid, new_agent = check_rule(timestep.state.rule_encoding, new_grid, new_agent, action, changed_position)
 
@@ -88,7 +92,7 @@ class Environment:
         )
         return timestep
 
-    def render(self, params: EnvParams, timestep: TimeStep) -> np.ndarray | str:
+    def render(self, params: EnvParamsT, timestep: TimeStep) -> np.ndarray | str:
         if params.render_mode == "rgb_array":
             return rgb_render(timestep.state.grid, timestep.state.agent, params.view_size)
         elif params.render_mode == "rich_text":

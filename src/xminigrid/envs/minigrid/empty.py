@@ -13,9 +13,9 @@ _goal_encoding = AgentOnTileGoal(tile=TILES_REGISTRY[Tiles.GOAL, Colors.GREEN]).
 _rule_encoding = EmptyRule().encode()[None, ...]
 
 
-class Empty(Environment):
+class Empty(Environment[EnvParams]):
     def default_params(self, **kwargs) -> EnvParams:
-        default_params = super().default_params(height=9, width=9)
+        default_params = EnvParams(height=9, width=9)
         default_params = default_params.replace(**kwargs)
         return default_params
 
@@ -40,9 +40,9 @@ class Empty(Environment):
         return state
 
 
-class EmptyRandom(Environment):
+class EmptyRandom(Environment[EnvParams]):
     def default_params(self, **kwargs) -> EnvParams:
-        default_params = super().default_params(height=9, width=9)
+        default_params = EnvParams(height=9, width=9)
         default_params = default_params.replace(**kwargs)
         return default_params
 

@@ -12,9 +12,9 @@ _goal_encoding = AgentOnTileGoal(tile=TILES_REGISTRY[Tiles.GOAL, Colors.GREEN]).
 _rule_encoding = EmptyRule().encode()[None, ...]
 
 
-class DoorKey(Environment):
+class DoorKey(Environment[EnvParams]):
     def default_params(self, **kwargs) -> EnvParams:
-        default_params = super().default_params(height=5, width=5)
+        default_params = EnvParams(height=5, width=5)
         default_params = default_params.replace(**kwargs)
         return default_params
 
