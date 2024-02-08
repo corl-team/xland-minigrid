@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import jax
 import jax.numpy as jnp
 from flax import struct
@@ -141,7 +143,7 @@ class XLandEnvParams(EnvParams):
     grid_type: int = struct.field(pytree_node=False, default="1R")
 
 
-class XLandMiniGrid(Environment[XLandEnvParams]):
+class XLandMiniGrid(Environment[XLandEnvParams, EnvCarry]):
     def default_params(self, **kwargs) -> XLandEnvParams:
         default_params = XLandEnvParams(view_size=5)
         return default_params.replace(**kwargs)
@@ -152,7 +154,7 @@ class XLandMiniGrid(Environment[XLandEnvParams]):
         # If this is too small, change it or increase number of trials (these are not equivalent).
         return 3 * (params.height * params.width)
 
-    def _generate_problem(self, params: XLandEnvParams, key: jax.Array) -> State:
+    def _generate_problem(self, params: XLandEnvParams, key: jax.Array) -> State[EnvCarry]:
         # WARN: we can make this compatible with jit (to vmap on different layouts during training),
         # but it will probably be very costly, as lax.switch will generate all layouts during reset under vmap
         # TODO: experiment with this under jit, does it possible to make it jit-compatible without overhead?

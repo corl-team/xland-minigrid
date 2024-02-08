@@ -1,4 +1,6 @@
-from typing import Union
+from __future__ import annotations
+
+from typing import Generic, TypeVar, Union
 
 import jax
 import jax.numpy as jnp
@@ -17,6 +19,7 @@ class RuleSet(struct.PyTreeNode):
 GridState: TypeAlias = jax.Array
 Tile: TypeAlias = jax.Array
 IntOrArray: TypeAlias = Union[int, jax.Array]
+EnvCarryT = TypeVar("EnvCarryT")
 
 
 class AgentState(struct.PyTreeNode):
@@ -29,7 +32,7 @@ class EnvCarry(struct.PyTreeNode):
     ...
 
 
-class State(struct.PyTreeNode):
+class State(struct.PyTreeNode, Generic[EnvCarryT]):
     key: jax.Array
     step_num: jax.Array
 
@@ -38,7 +41,7 @@ class State(struct.PyTreeNode):
     goal_encoding: jax.Array
     rule_encoding: jax.Array
 
-    carry: EnvCarry
+    carry: EnvCarryT
 
 
 class StepType(jnp.uint8):
@@ -47,8 +50,8 @@ class StepType(jnp.uint8):
     LAST: jax.Array = jnp.asarray(2, dtype=jnp.uint8)
 
 
-class TimeStep(struct.PyTreeNode):
-    state: State
+class TimeStep(struct.PyTreeNode, Generic[EnvCarryT]):
+    state: State[EnvCarryT]
 
     step_type: StepType
     reward: jax.Array

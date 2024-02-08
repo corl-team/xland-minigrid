@@ -35,7 +35,7 @@ classifiers = [
 dependencies = [
     "jax>=0.4.16",
     "jaxlib>=0.4.16",
-    "flax>=0.7.0",
+    "flax>=0.8.0",
     "rich>=13.4.2",
 ]
 
@@ -96,7 +96,7 @@ exclude = [
     "**/__pycache__",
 ]
 
-reportMissingImports = true
+reportMissingImports = "none"
 reportMissingTypeStubs = false
 pythonVersion = "3.10"
 pythonPlatform = "All"

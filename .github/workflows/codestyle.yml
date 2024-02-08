@@ -25,3 +25,6 @@ jobs:
       - name: check codestyle
         run: |
           ruff --config pyproject.toml --diff .
+      - name: check type hints
+        run: |
+          pyright --project=pyproject.toml src/xminigrid

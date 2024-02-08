@@ -4,7 +4,8 @@ import importlib
 from dataclasses import dataclass, field
 from typing import Any, Type
 
-from .environment import Environment, EnvParamsT
+from .environment import Environment, EnvParams
+from .types import EnvCarryT
 
 
 @dataclass
@@ -41,7 +42,9 @@ def load(name: str) -> Type[Environment]:
     return env_constructor
 
 
-def make(id: str, **kwargs: Any) -> tuple[Environment[EnvParamsT], EnvParamsT]:
+# TODO: this will give wrong type hints for some envs. How to fix this?
+# TODO: for example, Environment[CustomEnvParams, EnvCarry] or Environment[EnvParams, CustomEnvCarry]
+def make(id: str, **kwargs: Any) -> tuple[Environment, EnvParams]:
     if id not in _REGISTRY:
         raise ValueError(f"Unregistered environment. Available environments: {', '.join(registered_environments())}")
 

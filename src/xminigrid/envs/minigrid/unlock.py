@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import jax
 import jax.numpy as jnp
 
@@ -22,7 +24,7 @@ _allowed_colors = jnp.array(
 _rule_encoding = EmptyRule().encode()[None, ...]
 
 
-class Unlock(Environment[EnvParams]):
+class Unlock(Environment[EnvParams, EnvCarry]):
     def default_params(self, **kwargs) -> EnvParams:
         default_params = EnvParams(height=6, width=11)
         default_params = default_params.replace(**kwargs)
@@ -31,7 +33,7 @@ class Unlock(Environment[EnvParams]):
     def time_limit(self, params: EnvParams) -> int:
         return 8 * params.height**2
 
-    def _generate_problem(self, params: EnvParams, key: jax.Array):
+    def _generate_problem(self, params: EnvParams, key: jax.Array) -> State[EnvCarry]:
         key, *keys = jax.random.split(key, num=5)
 
         color = jax.random.choice(keys[0], _allowed_colors)

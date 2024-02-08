@@ -10,10 +10,11 @@ import xminigrid
 from xminigrid.wrappers import GymAutoResetWrapper
 
 from .environment import Environment, EnvParamsT
+from .types import EnvCarryT
 
 
 class ManualControl:
-    def __init__(self, env: Environment[EnvParamsT], env_params: EnvParamsT):
+    def __init__(self, env: Environment[EnvParamsT, EnvCarryT], env_params: EnvParamsT):
         self.env = env
         self.env_params = env_params
 

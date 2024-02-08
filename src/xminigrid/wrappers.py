@@ -1,11 +1,13 @@
+from __future__ import annotations
+
 import jax
 
 from .environment import Environment, EnvParamsT
-from .types import IntOrArray, State, TimeStep
+from .types import EnvCarryT, IntOrArray, State, TimeStep
 
 
-class Wrapper(Environment[EnvParamsT]):
-    def __init__(self, env: Environment[EnvParamsT]):
+class Wrapper(Environment[EnvParamsT, EnvCarryT]):
+    def __init__(self, env: Environment[EnvParamsT, EnvCarryT]):
         self._env = env
 
     # Question: what if wrapper adds new parameters to the dataclass?
@@ -17,16 +19,16 @@ class Wrapper(Environment[EnvParamsT]):
     def time_limit(self, params: EnvParamsT) -> int:
         return self._env.time_limit(params)
 
-    def _generate_problem(self, params: EnvParamsT, key: jax.Array) -> State:
+    def _generate_problem(self, params: EnvParamsT, key: jax.Array) -> State[EnvCarryT]:
         return self._env._generate_problem(params, key)
 
-    def reset(self, params: EnvParamsT, key: jax.Array) -> TimeStep:
+    def reset(self, params: EnvParamsT, key: jax.Array) -> TimeStep[EnvCarryT]:
         return self._env.reset(params, key)
 
-    def step(self, params: EnvParamsT, timestep: TimeStep, action: IntOrArray) -> TimeStep:
+    def step(self, params: EnvParamsT, timestep: TimeStep[EnvCarryT], action: IntOrArray) -> TimeStep[EnvCarryT]:
         return self._env.step(params, timestep, action)
 
-    def render(self, params: EnvParamsT, timestep: TimeStep):
+    def render(self, params: EnvParamsT, timestep: TimeStep[EnvCarryT]):
         return self._env.render(params, timestep)
 
 

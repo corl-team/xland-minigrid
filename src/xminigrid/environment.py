@@ -15,7 +15,7 @@ from .core.observation import transparent_field_of_view
 from .core.rules import check_rule
 from .rendering.rgb_render import render as rgb_render
 from .rendering.text_render import render as text_render
-from .types import IntOrArray, State, StepType, TimeStep
+from .types import EnvCarryT, IntOrArray, State, StepType, TimeStep
 
 
 class EnvParams(struct.PyTreeNode):
@@ -32,7 +32,7 @@ class EnvParams(struct.PyTreeNode):
 EnvParamsT = TypeVar("EnvParamsT", bound="EnvParams")
 
 
-class Environment(abc.ABC, Generic[EnvParamsT]):
+class Environment(abc.ABC, Generic[EnvParamsT, EnvCarryT]):
     @abc.abstractmethod
     def default_params(self, **kwargs: Any) -> EnvParamsT:
         ...
@@ -48,10 +48,10 @@ class Environment(abc.ABC, Generic[EnvParamsT]):
         return 3 * params.height * params.width
 
     @abc.abstractmethod
-    def _generate_problem(self, params: EnvParamsT, key: jax.Array) -> State:
+    def _generate_problem(self, params: EnvParamsT, key: jax.Array) -> State[EnvCarryT]:
         ...
 
-    def reset(self, params: EnvParamsT, key: jax.Array) -> TimeStep:
+    def reset(self, params: EnvParamsT, key: jax.Array) -> TimeStep[EnvCarryT]:
         state = self._generate_problem(params, key)
         timestep = TimeStep(
             state=state,
@@ -63,7 +63,7 @@ class Environment(abc.ABC, Generic[EnvParamsT]):
         return timestep
 
     # Why timestep + state at once, and not like in Jumanji? To be able to do autoresets in gym and envpools styles
-    def step(self, params: EnvParamsT, timestep: TimeStep, action: IntOrArray) -> TimeStep:
+    def step(self, params: EnvParamsT, timestep: TimeStep[EnvCarryT], action: IntOrArray) -> TimeStep[EnvCarryT]:
         new_grid, new_agent, changed_position = take_action(timestep.state.grid, timestep.state.agent, action)
         new_grid, new_agent = check_rule(timestep.state.rule_encoding, new_grid, new_agent, action, changed_position)
 
@@ -92,9 +92,9 @@ class Environment(abc.ABC, Generic[EnvParamsT]):
         )
         return timestep
 
-    def render(self, params: EnvParamsT, timestep: TimeStep) -> np.ndarray | str:
+    def render(self, params: EnvParamsT, timestep: TimeStep[EnvCarryT]) -> np.ndarray | str:
         if params.render_mode == "rgb_array":
-            return rgb_render(timestep.state.grid, timestep.state.agent, params.view_size)
+            return rgb_render(np.asarray(timestep.state.grid), timestep.state.agent, params.view_size)
         elif params.render_mode == "rich_text":
             return text_render(timestep.state.grid, timestep.state.agent)
         else:
