@@ -98,5 +98,7 @@ exclude = [
 
 reportMissingImports = "none"
 reportMissingTypeStubs = false
+reportMissingModuleSource = false
+
 pythonVersion = "3.10"
 pythonPlatform = "All"
