@@ -7,11 +7,11 @@
     <a href="https://badge.fury.io/py/xminigrid">
         <img src="https://badge.fury.io/py/xminigrid.svg"/>
     </a>
-    <a href="https://github.com/corl-team/xland-minigrid/main/LICENSE">
-        <img src="https://img.shields.io/badge/license-Apache_2.0-blue"/>
-    </a>
     <a href="https://github.com/astral-sh/ruff">
         <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v2.json"/>
+    </a>
+    <a href="https://arxiv.org/abs/2312.12044">
+        <img src="https://img.shields.io/badge/arXiv-2210.07105-b31b1b.svg"/>
     </a>
     <a href="https://twitter.com/vladkurenkov/status/1731709425524543550">
         <img src="https://badgen.net/badge/icon/twitter?icon=twitter&label"/>
@@ -21,10 +21,15 @@
     </a>
 </p>
 
-
 [//]: # (    <a href="https://badge.fury.io/py/xminigrid">)
 
 [//]: # (        <img src="https://img.shields.io/pypi/dm/xminigrid?color=yellow&label=Downloads"/>)
+
+[//]: # (    </a>)
+
+[//]: # (    <a href="https://github.com/corl-team/xland-minigrid/main/LICENSE">)
+
+[//]: # (        <img src="https://img.shields.io/badge/license-Apache_2.0-blue"/>)
 
 [//]: # (    </a>)
 
@@ -51,11 +56,10 @@ diverse task distributions
 - 📈 Easily scales to $2^{16}$ parallel environments and millions of steps per second on a single GPU
 - 🔥 Multi-GPU PPO baselines in the [PureJaxRL](https://github.com/luchris429/purejaxrl) style, which can achieve **1 trillion** environment steps under two days 
 
-How cool is that? For more details, take a look at the [technical paper (soon)]() or
+How cool is that? For more details, take a look at the [technical paper](https://arxiv.org/abs/2312.12044) or
 [examples](examples), which will walk you through the basics and training your own adaptive agents in minutes!
 
 ![img](figures/times_minigrid.jpg)
-TODO: update this with the latest version of the codebase...
 
 ## Installation 🎁
 
@@ -90,6 +94,7 @@ On the high level, current API combines [dm_env](https://github.com/google-deepm
 ```python
 import jax
 import xminigrid
+from xminigrid.wrappers import GymAutoResetWrapper
 
 key = jax.random.PRNGKey(0)
 reset_key, ruleset_key = jax.random.split(key)
@@ -102,6 +107,9 @@ ruleset = benchmark.sample_ruleset(ruleset_key)
 # to list available environments: xminigrid.registered_environments()
 env, env_params = xminigrid.make("XLand-MiniGrid-R9-25x25")
 env_params = env_params.replace(ruleset=ruleset)
+
+# auto-reset wrapper
+env = GymAutoResetWrapper(env)
 
 # fully jit-compatible step and reset methods
 timestep = jax.jit(env.reset)(env_params, reset_key)
@@ -157,7 +165,7 @@ While composing rules and goals by hand is flexible, it can quickly become cumbe
 Besides, it's hard to express efficiently in a JAX-compatible way due to the high number of heterogeneous computations 
 
 To avoid significant overhead during training and facilitate reliable comparisons between agents, 
-we pre-sampled several benchmarks with up to **five million unique tasks**, following the procedure used to train DeepMind 
+we pre-sampled several benchmarks with up to **three million unique tasks**, following the procedure used to train DeepMind 
 AdA agent from the original XLand. These benchmarks differ in the generation configs, producing distributions with
 varying levels of diversity and average difficulty of the tasks. They can be used for different purposes, for example
 the `trivial-1m` benchmark can be used to debug your agents, allowing very quick iterations. However, we would caution 
@@ -189,7 +197,7 @@ We also provide the [script](scripts/ruleset_generator.py) used to generate thes
 python scripts/ruleset_generator.py --help
 ```
 
-In depth description of all available benchmarks is provided [here (soon)]().
+In depth description of all available benchmarks is provided [in the technical paper](https://arxiv.org/abs/2312.12044) (Section 3).
 
 **P.S.** Be aware, that benchmarks can change, as we are currently testing and balancing them!
 
@@ -248,20 +256,6 @@ Furthermore, we provide standalone implementations that can be trained in Colab:
 **P.S.** Do not expect that provided baselines will solve the hardest environments or benchmarks 
 available. How much fun would that be 🤔? However, we hope that they will 
 help to get started quickly!
-
-## Roadmap 🗓️
-
-With the initial release of XLand-MiniGrid, things are just getting started. There is a long way to go in 
-terms of polishing the code, adding new features, and improving the overall user experience. What we
-currently plan to improve in forthcoming releases:
-1. Tweaks to the benchmark generation, time-limits
-2. Documentation (in code and as standalone site)
-3. Full type hints coverage, type checking
-4. Tests 
-5. More examples and tutorials
-
-After that we will start thinking on new major features, environments and bechmarks. 
-However, we should perfect the core before that.
 
 ## Contributing 🔨
 
