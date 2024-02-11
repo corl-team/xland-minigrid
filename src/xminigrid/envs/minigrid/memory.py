@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import jax
 import jax.numpy as jnp
+from flax import struct
 
 from ...core.actions import take_action
 from ...core.constants import TILES_REGISTRY, Colors, Tiles
@@ -8,7 +11,7 @@ from ...core.grid import equal, horizontal_line, rectangle, room, vertical_line
 from ...core.observation import transparent_field_of_view
 from ...core.rules import EmptyRule
 from ...environment import Environment, EnvParams
-from ...types import AgentState, EnvCarry, State, StepType, TimeStep
+from ...types import AgentState, IntOrArray, State, StepType, TimeStep  # , EnvCarry
 
 _goal_encoding = EmptyGoal().encode()
 _rule_encoding = EmptyRule().encode()[None, ...]
@@ -27,22 +30,23 @@ _floor_tile = TILES_REGISTRY[Tiles.FLOOR, Colors.BLACK]
 
 # It can be made to be a goal, but for demonstration
 # purposes (how to use carry) we decided to leave it as is
-class MemoryEnvCarry(EnvCarry):
+# class MemoryEnvCarry(EnvCarry):
+class MemoryEnvCarry(struct.PyTreeNode):
     success_pos: jax.Array
     failure_pos: jax.Array
 
 
 # TODO: Random corridor length is a bit problematic due to the dynamic slicing.
-class Memory(Environment):
+class Memory(Environment[EnvParams, MemoryEnvCarry]):
     def default_params(self, **kwargs) -> EnvParams:
-        default_params = super().default_params(height=7, width=13, view_size=3)
+        default_params = EnvParams(height=7, width=13, view_size=3)
         default_params = default_params.replace(**kwargs)
         return default_params
 
     def time_limit(self, params: EnvParams) -> int:
         return 5 * params.width**2
 
-    def _generate_problem(self, params: EnvParams, key: jax.Array) -> State:
+    def _generate_problem(self, params: EnvParams, key: jax.Array) -> State[MemoryEnvCarry]:
         key, corridor_key, agent_key, mem_key, place_key = jax.random.split(key, num=5)
 
         corridor_length = params.width - 6
@@ -101,7 +105,9 @@ class Memory(Environment):
         )
         return state
 
-    def step(self, params: EnvParams, timestep: TimeStep, action: int) -> TimeStep:
+    def step(
+        self, params: EnvParams, timestep: TimeStep[MemoryEnvCarry], action: IntOrArray
+    ) -> TimeStep[MemoryEnvCarry]:
         # disabling pick_up action
         action = jax.lax.select(jnp.equal(action, 3), 5, action)
         new_grid, new_agent, _ = take_action(timestep.state.grid, timestep.state.agent, action)

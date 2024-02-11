@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import jax
 import jax.numpy as jnp
 
@@ -13,16 +15,16 @@ _goal_encoding = AgentOnTileGoal(tile=TILES_REGISTRY[Tiles.GOAL, Colors.GREEN]).
 _rule_encoding = EmptyRule().encode()[None, ...]
 
 
-class Empty(Environment):
+class Empty(Environment[EnvParams, EnvCarry]):
     def default_params(self, **kwargs) -> EnvParams:
-        default_params = super().default_params(height=9, width=9)
+        default_params = EnvParams(height=9, width=9)
         default_params = default_params.replace(**kwargs)
         return default_params
 
     def time_limit(self, params: EnvParams) -> int:
         return 4 * (params.height * params.width)
 
-    def _generate_problem(self, params: EnvParams, key: jax.Array):
+    def _generate_problem(self, params: EnvParams, key: jax.Array) -> State[EnvCarry]:
         grid = room(params.height, params.width)
 
         grid = grid.at[params.height - 2, params.width - 2].set(TILES_REGISTRY[Tiles.GOAL, Colors.GREEN])
@@ -40,16 +42,16 @@ class Empty(Environment):
         return state
 
 
-class EmptyRandom(Environment):
+class EmptyRandom(Environment[EnvParams, EnvCarry]):
     def default_params(self, **kwargs) -> EnvParams:
-        default_params = super().default_params(height=9, width=9)
+        default_params = EnvParams(height=9, width=9)
         default_params = default_params.replace(**kwargs)
         return default_params
 
     def time_limit(self, params: EnvParams) -> int:
         return 4 * (params.height * params.width)
 
-    def _generate_problem(self, params: EnvParams, key: jax.Array):
+    def _generate_problem(self, params: EnvParams, key: jax.Array) -> State[EnvCarry]:
         key, pos_key, dir_key = jax.random.split(key, num=3)
 
         grid = room(params.height, params.width)

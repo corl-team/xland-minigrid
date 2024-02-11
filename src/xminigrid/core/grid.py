@@ -1,16 +1,15 @@
 from __future__ import annotations
 
-from typing import Callable
+from typing import Callable, Union
 
 import jax
 import jax.numpy as jnp
-from jax.random import KeyArray
 
-from ..types import GridState, Tile
+from ..types import GridState, IntOrArray, Tile
 from .constants import FREE_TO_PUT_DOWN, LOS_BLOCKING, PICKABLE, TILES_REGISTRY, WALKABLE, Colors, Tiles
 
 
-def empty_world(height: int, width: int) -> GridState:
+def empty_world(height: IntOrArray, width: IntOrArray) -> GridState:
     grid = jnp.zeros((height, width, 2), dtype=jnp.uint8)
     grid = grid.at[:, :, 0:2].set(TILES_REGISTRY[Tiles.FLOOR, Colors.BLACK])
     return grid
@@ -21,7 +20,7 @@ def equal(tile1: Tile, tile2: Tile) -> Tile:
     return jnp.all(jnp.equal(tile1, tile2))
 
 
-def get_neighbouring_tiles(grid: GridState, y: int | jax.Array, x: int | jax.Array) -> tuple[Tile, Tile, Tile, Tile]:
+def get_neighbouring_tiles(grid: GridState, y: IntOrArray, x: IntOrArray) -> tuple[Tile, Tile, Tile, Tile]:
     # end_of_map = TILES_REGISTRY[Tiles.END_OF_MAP, Colors.END_OF_MAP]
     end_of_map = Tiles.END_OF_MAP
 
@@ -36,17 +35,17 @@ def get_neighbouring_tiles(grid: GridState, y: int | jax.Array, x: int | jax.Arr
     return up_tile, right_tile, down_tile, left_tile
 
 
-def horizontal_line(grid: GridState, x: int, y: int, length: int, tile: Tile) -> GridState:
+def horizontal_line(grid: GridState, x: IntOrArray, y: IntOrArray, length: IntOrArray, tile: Tile) -> GridState:
     grid = grid.at[y, x : x + length].set(tile)
     return grid
 
 
-def vertical_line(grid: GridState, x: int, y: int, length: int, tile: Tile) -> GridState:
+def vertical_line(grid: GridState, x: IntOrArray, y: IntOrArray, length: IntOrArray, tile: Tile) -> GridState:
     grid = grid.at[y : y + length, x].set(tile)
     return grid
 
 
-def rectangle(grid: GridState, x: int, y: int, h: int, w: int, tile: Tile) -> GridState:
+def rectangle(grid: GridState, x: IntOrArray, y: IntOrArray, h: IntOrArray, w: IntOrArray, tile: Tile) -> GridState:
     grid = vertical_line(grid, x, y, h, tile)
     grid = vertical_line(grid, x + w - 1, y, h, tile)
     grid = horizontal_line(grid, x, y, w, tile)
@@ -54,13 +53,13 @@ def rectangle(grid: GridState, x: int, y: int, h: int, w: int, tile: Tile) -> Gr
     return grid
 
 
-def room(height: int, width: int) -> GridState:
+def room(height: IntOrArray, width: IntOrArray) -> GridState:
     grid = empty_world(height, width)
     grid = rectangle(grid, 0, 0, height, width, tile=TILES_REGISTRY[Tiles.WALL, Colors.GREY])
     return grid
 
 
-def two_rooms(height: int, width: int) -> GridState:
+def two_rooms(height: IntOrArray, width: IntOrArray) -> GridState:
     wall_tile: Tile = TILES_REGISTRY[Tiles.WALL, Colors.GREY]
 
     grid = empty_world(height, width)
@@ -69,7 +68,7 @@ def two_rooms(height: int, width: int) -> GridState:
     return grid
 
 
-def four_rooms(height: int, width: int) -> GridState:
+def four_rooms(height: IntOrArray, width: IntOrArray) -> GridState:
     wall_tile: Tile = TILES_REGISTRY[Tiles.WALL, Colors.GREY]
 
     grid = empty_world(height, width)
@@ -79,7 +78,7 @@ def four_rooms(height: int, width: int) -> GridState:
     return grid
 
 
-def nine_rooms(height: int, width: int) -> GridState:
+def nine_rooms(height: IntOrArray, width: IntOrArray) -> GridState:
     wall_tile: Tile = TILES_REGISTRY[Tiles.WALL, Colors.GREY]
 
     grid = empty_world(height, width)
@@ -118,7 +117,7 @@ def check_see_behind(grid: GridState, position: jax.Array) -> jax.Array:
     return is_not_blocking
 
 
-def align_with_up(grid: GridState, direction: int | jax.Array) -> GridState:
+def align_with_up(grid: GridState, direction: IntOrArray) -> GridState:
     aligned_grid = jax.lax.switch(
         direction,
         (
@@ -151,7 +150,7 @@ def free_tiles_mask(grid: GridState) -> jax.Array:
     return mask
 
 
-def coordinates_mask(grid: GridState, address: tuple[int, int], comparison_fn: Callable) -> jax.Array:
+def coordinates_mask(grid: GridState, address: tuple[IntOrArray, IntOrArray], comparison_fn: Callable) -> jax.Array:
     positions = jnp.mgrid[: grid.shape[0], : grid.shape[1]]
     cond_1 = comparison_fn(positions[0], address[0])
     cond_2 = comparison_fn(positions[1], address[1])
@@ -159,7 +158,7 @@ def coordinates_mask(grid: GridState, address: tuple[int, int], comparison_fn: C
     return mask
 
 
-def sample_coordinates(key: KeyArray, grid: GridState, num: int, mask: jax.Array | None = None) -> jax.Array:
+def sample_coordinates(key: jax.Array, grid: GridState, num: int, mask: jax.Array | None = None) -> jax.Array:
     if mask is None:
         mask = jnp.ones((grid.shape[0], grid.shape[1]), dtype=jnp.bool_)
 
@@ -175,7 +174,7 @@ def sample_coordinates(key: KeyArray, grid: GridState, num: int, mask: jax.Array
     return coords
 
 
-def sample_direction(key: KeyArray) -> jax.Array:
+def sample_direction(key: jax.Array) -> jax.Array:
     return jax.random.randint(key, shape=(), minval=0, maxval=4)
 
 

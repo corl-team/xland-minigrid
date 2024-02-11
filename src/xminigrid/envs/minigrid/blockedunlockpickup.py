@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import jax
 import jax.numpy as jnp
 
@@ -31,16 +33,16 @@ _allowed_entities = jnp.array(
 _rule_encoding = EmptyRule().encode()[None, ...]
 
 
-class BlockedUnlockPickUp(Environment):
+class BlockedUnlockPickUp(Environment[EnvParams, EnvCarry]):
     def default_params(self, **kwargs) -> EnvParams:
-        default_params = super().default_params(height=6, width=11)
+        default_params = EnvParams(height=6, width=11)
         default_params = default_params.replace(**kwargs)
         return default_params
 
     def time_limit(self, params: EnvParams) -> int:
         return 16 * params.height**2
 
-    def _generate_problem(self, params: EnvParams, key: jax.Array) -> State:
+    def _generate_problem(self, params: EnvParams, key: jax.Array) -> State[EnvCarry]:
         key, _key = jax.random.split(key)
         keys = jax.random.split(_key, num=7)
 

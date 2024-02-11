@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import jax
 import jax.numpy as jnp
 from flax import struct
@@ -41,14 +43,14 @@ class PlaygroundEnvParams(EnvParams):
     num_objects: int = struct.field(pytree_node=False, default=12)
 
 
-class Playground(Environment):
+class Playground(Environment[PlaygroundEnvParams, EnvCarry]):
     def default_params(self, **kwargs) -> PlaygroundEnvParams:
         return PlaygroundEnvParams(height=19, width=19).replace(**kwargs)
 
     def time_limit(self, params: EnvParams) -> int:
         return 512
 
-    def _generate_problem(self, params: PlaygroundEnvParams, key: jax.Array) -> State:
+    def _generate_problem(self, params: PlaygroundEnvParams, key: jax.Array) -> State[EnvCarry]:
         key, *keys = jax.random.split(key, num=6)
 
         grid = nine_rooms(params.height, params.width)

@@ -27,7 +27,7 @@ pip install -e ".[dev]"
 
 ## Code style
 
-We use awesome [Ruff](https://docs.astral.sh/ruff/) linter and formatter. 
+We use awesome [Ruff](https://docs.astral.sh/ruff/) linter and formatter and [Pyright](https://microsoft.github.io/pyright/#/) for type checking. 
 The CI will run several checks on the new code pushed to the repository.
 These checks can also be run locally without waiting for the CI by following the steps below: 
 
@@ -42,6 +42,7 @@ skipped (not recommended) with `git commit --no-verify`.
 Be sure to run and fix all issues from the `pre-commit run --all-files` before the push!
 If you want to see possible problems before pre-commit, you can run `ruff check --diff .` 
 and `ruff format --check` to see exact linter and formatter suggestions and possible fixes. 
+Similarly, run `pyright src/xminigrid` to see possible problems with type hints.
 
 # License
 

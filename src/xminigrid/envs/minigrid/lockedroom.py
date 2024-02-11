@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import jax
 import jax.numpy as jnp
 
@@ -26,16 +28,16 @@ _allowed_colors = jnp.array(
 )
 
 
-class LockedRoom(Environment):
+class LockedRoom(Environment[EnvParams, EnvCarry]):
     def default_params(self, **kwargs) -> EnvParams:
-        default_params = super().default_params(height=19, width=19)
+        default_params = EnvParams(height=19, width=19)
         default_params = default_params.replace(**kwargs)
         return default_params
 
     def time_limit(self, params: EnvParams) -> int:
         return 10 * params.height
 
-    def _generate_problem(self, params: EnvParams, key: jax.Array) -> State:
+    def _generate_problem(self, params: EnvParams, key: jax.Array) -> State[EnvCarry]:
         key, rooms_key, colors_key, objects_key, coords_key, agent_pos_key, agent_dir_key = jax.random.split(key, num=7)
 
         # set up rooms

@@ -54,7 +54,7 @@ RULE_TILE_STR = {
 PLAYER_STR = {0: "^", 1: ">", 2: "V", 3: "<"}
 
 
-def _wrap_with_color(string, color):
+def _wrap_with_color(string: str, color: str) -> str:
     return f"[bold {color}]{string}[/bold {color}]"
 
 
@@ -81,11 +81,11 @@ def render(grid: jax.Array, agent: AgentState | None = None) -> str:
 
 
 # WARN: This is for debugging mainly! Will refactor later if needed.
-def _encode_tile(tile):
+def _encode_tile(tile: list[int]) -> str:
     return f"{COLOR_NAMES[tile[1]]} {RULE_TILE_STR[tile[0]]}"
 
 
-def _text_encode_goal(goal):
+def _text_encode_goal(goal: list[int]) -> str:
     goal_id = goal[0]
     if goal_id == 1:
         return f"AgentHold({_encode_tile(goal[1:3])})"
@@ -113,7 +113,7 @@ def _text_encode_goal(goal):
         raise RuntimeError(f"Rendering: Unknown goal id: {goal_id}")
 
 
-def _text_encode_rule(rule):
+def _text_encode_rule(rule: list[int]) -> str:
     rule_id = rule[0]
     if rule_id == 1:
         return f"AgentHold({_encode_tile(rule[1:3])}) -> {_encode_tile(rule[3:5])}"
@@ -141,7 +141,7 @@ def _text_encode_rule(rule):
         raise RuntimeError(f"Rendering: Unknown rule id: {rule_id}")
 
 
-def print_ruleset(ruleset: RuleSet):
+def print_ruleset(ruleset: RuleSet) -> None:
     print("GOAL:")
     print(_text_encode_goal(ruleset.goal.tolist()))
     print()

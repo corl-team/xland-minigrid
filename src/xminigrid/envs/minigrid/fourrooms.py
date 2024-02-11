@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import jax
 import jax.numpy as jnp
 
@@ -13,9 +15,9 @@ _goal_encoding = AgentOnTileGoal(tile=TILES_REGISTRY[Tiles.GOAL, Colors.GREEN]).
 _rule_encoding = EmptyRule().encode()[None, ...]
 
 
-class FourRooms(Environment):
+class FourRooms(Environment[EnvParams, EnvCarry]):
     def default_params(self, **kwargs) -> EnvParams:
-        default_params = super().default_params(height=19, width=19)
+        default_params = EnvParams(height=19, width=19)
         default_params = default_params.replace(**kwargs)
         return default_params
 
@@ -23,7 +25,7 @@ class FourRooms(Environment):
         # TODO: this is hardcoded and thus problematic. Move it to EnvParams?
         return 100
 
-    def _generate_problem(self, params: EnvParams, key: jax.Array) -> State:
+    def _generate_problem(self, params: EnvParams, key: jax.Array) -> State[EnvCarry]:
         key, *keys = jax.random.split(key, num=4)
 
         grid = four_rooms(params.height, params.width)

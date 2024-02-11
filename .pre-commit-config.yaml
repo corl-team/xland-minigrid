@@ -1,6 +1,6 @@
 repos:
+  # ruff checking
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    # Ruff version.
     rev: v0.1.4
     hooks:
       # Run the linter.
@@ -8,3 +8,10 @@ repos:
         args: [--fix]
       # Run the formatter.
       - id: ruff-format
+
+  # pyright checking
+  - repo: https://github.com/RobertCraigie/pyright-python
+    rev: v1.1.350
+    hooks:
+      - id: pyright
+        args: [--project=pyproject.toml]
