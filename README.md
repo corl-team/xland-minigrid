@@ -164,7 +164,13 @@ Besides, it's hard to express efficiently in a JAX-compatible way due to the hig
 
 To avoid significant overhead during training and facilitate reliable comparisons between agents, 
 we pre-sampled several benchmarks with up to **three million unique tasks**, following the procedure used to train DeepMind 
-AdA agent from the original XLand. These benchmarks differ in the generation configs, producing distributions with
+AdA agent from the original XLand. Each task is represented with a tree, where root is a goal and all nodes are production rules, which should be triggered in a sequence to solve the task:
+
+![task-tree](figures/task_tree_demo.jpg)
+
+[//]: # (<img src="figures/task_tree_demo.jpg" width="100%">)
+
+These benchmarks differ in the generation configs, producing distributions with
 varying levels of diversity and average difficulty of the tasks. They can be used for different purposes, for example
 the `trivial-1m` benchmark can be used to debug your agents, allowing very quick iterations. However, we would caution 
 against treating benchmarks as a progression from simple to complex. They are just different 🤷.
@@ -195,7 +201,7 @@ We also provide the [script](scripts/ruleset_generator.py) used to generate thes
 python scripts/ruleset_generator.py --help
 ```
 
-In depth description of all available benchmarks is provided [in the technical paper](https://arxiv.org/abs/2312.12044) (Section 3). 
+In depth description of all available benchmarks is provided [in the technical paper](https://arxiv.org/abs/2312.12044) (Section 3).
 
 ## Environments 🌍
 
