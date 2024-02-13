@@ -166,9 +166,9 @@ To avoid significant overhead during training and facilitate reliable comparison
 we pre-sampled several benchmarks with up to **three million unique tasks**, following the procedure used to train DeepMind 
 AdA agent from the original XLand. Each task is represented with a tree, where root is a goal and all nodes are production rules, which should be triggered in a sequence to solve the task:
 
-![task-tree](figures/task_tree_demo.jpg)
-
-[//]: # (<img src="figures/task_tree_demo.jpg" width="100%">)
+<p align="center">
+  <img src="figures/task_tree_demo.jpg" width="60%"/>
+</p>
 
 These benchmarks differ in the generation configs, producing distributions with
 varying levels of diversity and average difficulty of the tasks. They can be used for different purposes, for example
