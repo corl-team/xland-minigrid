@@ -63,8 +63,6 @@ How cool is that? For more details, take a look at the [technical paper](https:/
 
 ## Installation 🎁
 
-> ⚠️ XLand-MiniGrid is currently in alpha stage, so expect breaking changes! ⚠️
-
 The latest release of XLand-MiniGrid can be installed directly from PyPI:
 
 ```commandline
@@ -197,9 +195,7 @@ We also provide the [script](scripts/ruleset_generator.py) used to generate thes
 python scripts/ruleset_generator.py --help
 ```
 
-In depth description of all available benchmarks is provided [in the technical paper](https://arxiv.org/abs/2312.12044) (Section 3).
-
-**P.S.** Be aware, that benchmarks can change, as we are currently testing and balancing them!
+In depth description of all available benchmarks is provided [in the technical paper](https://arxiv.org/abs/2312.12044) (Section 3). 
 
 ## Environments 🌍
 
