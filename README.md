@@ -59,7 +59,7 @@ diverse task distributions
 How cool is that? For more details, take a look at the [technical paper](https://arxiv.org/abs/2312.12044) or
 [examples](examples), which will walk you through the basics and training your own adaptive agents in minutes!
 
-![img](figures/times_minigrid.jpg)
+[//]: # (![img]&#40;figures/times_minigrid.jpg&#41;)
 
 ## Installation 🎁
 
