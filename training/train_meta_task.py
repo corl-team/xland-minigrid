@@ -34,7 +34,7 @@ class TrainConfig:
     project: str = "xminigrid"
     group: str = "default"
     name: str = "meta-task-ppo"
-    env_id: str = "XLand-Minigrid-R1-9x9"
+    env_id: str = "XLand-MiniGrid-R1-9x9"
     benchmark_id: str = "trivial-1m"
     # agent
     action_emb_dim: int = 16

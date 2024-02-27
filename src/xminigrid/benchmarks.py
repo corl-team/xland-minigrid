@@ -21,8 +21,8 @@ NAME2HFFILENAME = {
     "trivial-1m": "trivial_1m",
     "small-1m": "small_1m",
     "small-dist-1m": "small_dist_1m",
-    "medium-1m": "medium_1m",
-    "medium-3m": "medium_3m",
+    "medium-1m": "medium_1m_v1",
+    "medium-3m": "medium_3m_v1",
     "high-1m": "high_1m",
     "high-3m": "high_3m",
 }

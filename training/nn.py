@@ -109,7 +109,8 @@ class ActorCriticRNN(nn.Module):
             [
                 nn.Conv(16, (2, 2), padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
                 nn.relu,
-                MaxPool2d((2, 2)),
+                # use this only for image sizes >= 7
+                # MaxPool2d((2, 2)),
                 nn.Conv(32, (2, 2), padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
                 nn.relu,
                 nn.Conv(64, (2, 2), padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
