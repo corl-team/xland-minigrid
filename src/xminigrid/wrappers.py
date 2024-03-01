@@ -16,6 +16,12 @@ class Wrapper(Environment[EnvParamsT, EnvCarryT]):
     def default_params(self, **kwargs) -> EnvParamsT:
         return self._env.default_params(**kwargs)
 
+    def num_actions(self, params: EnvParamsT) -> int:
+        return self._env.num_actions(params)
+
+    def observation_shape(self, params: EnvParamsT) -> tuple[int, int, int]:
+        return self._env.observation_shape(params)
+
     def time_limit(self, params: EnvParamsT) -> int:
         return self._env.time_limit(params)
 

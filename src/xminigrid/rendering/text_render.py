@@ -5,8 +5,6 @@ from ..core.constants import Colors, Tiles
 from ..types import AgentState, RuleSet
 
 COLOR_NAMES = {
-    Colors.END_OF_MAP: "red",
-    Colors.UNSEEN: "white",
     Colors.EMPTY: "white",
     Colors.RED: "red",
     Colors.GREEN: "green",
@@ -22,8 +20,6 @@ COLOR_NAMES = {
 }
 
 TILE_STR = {
-    Tiles.END_OF_MAP: "!",
-    Tiles.UNSEEN: "?",
     Tiles.EMPTY: " ",
     Tiles.FLOOR: ".",
     Tiles.WALL: "☰",

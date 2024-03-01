@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, Union
+from typing import Callable
 
 import jax
 import jax.numpy as jnp
@@ -22,7 +22,7 @@ def equal(tile1: Tile, tile2: Tile) -> Tile:
 
 def get_neighbouring_tiles(grid: GridState, y: IntOrArray, x: IntOrArray) -> tuple[Tile, Tile, Tile, Tile]:
     # end_of_map = TILES_REGISTRY[Tiles.END_OF_MAP, Colors.END_OF_MAP]
-    end_of_map = Tiles.END_OF_MAP
+    end_of_map = Tiles.EMPTY
 
     up_tile = grid.at[y - 1, x].get(mode="fill", fill_value=end_of_map)
     right_tile = grid.at[y, x + 1].get(mode="fill", fill_value=end_of_map)

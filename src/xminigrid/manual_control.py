@@ -14,9 +14,10 @@ from .types import EnvCarryT
 
 
 class ManualControl:
-    def __init__(self, env: Environment[EnvParamsT, EnvCarryT], env_params: EnvParamsT):
+    def __init__(self, env: Environment[EnvParamsT, EnvCarryT], env_params: EnvParamsT, agent_view: bool = False):
         self.env = env
         self.env_params = env_params
+        self.agent_view = agent_view
 
         self._reset = jax.jit(self.env.reset)
         self._step = jax.jit(self.env.step)
@@ -33,7 +34,10 @@ class ManualControl:
     def render(self) -> None:
         assert self.timestep is not None
 
-        img = self.env.render(self.env_params, self.timestep)
+        if self.agent_view:
+            img = self.timestep.observation
+        else:
+            img = self.env.render(self.env_params, self.timestep)
         # [h, w, c] -> [w, h, c]
         img = np.transpose(img, axes=(1, 0, 2))
 
@@ -144,14 +148,20 @@ if __name__ == "__main__":
     parser.add_argument("--env-id", type=str, default="MiniGrid-Empty-5x5", choices=xminigrid.registered_environments())
     parser.add_argument("--benchmark-id", type=str, default="trivial-1m", choices=xminigrid.registered_benchmarks())
     parser.add_argument("--ruleset-id", type=int, default=0)
+    parser.add_argument("--agent-view", action="store_true")
 
     args = parser.parse_args()
     env, env_params = xminigrid.make(args.env_id)
     env = GymAutoResetWrapper(env)
 
+    if args.agent_view:
+        from xminigrid.experimental.img_obs import RGBImgObservationWrapper
+
+        env = RGBImgObservationWrapper(env)
+
     if "XLand" in args.env_id:
         bench = xminigrid.load_benchmark(args.benchmark_id)
         env_params = env_params.replace(ruleset=bench.get_ruleset(args.ruleset_id))
 
-    control = ManualControl(env=env, env_params=env_params)
+    control = ManualControl(env=env, env_params=env_params, agent_view=args.agent_view)
     control.start()
