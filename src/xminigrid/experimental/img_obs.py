@@ -16,9 +16,9 @@ from ..wrappers import Wrapper
 CACHE_PATH = os.environ.get("XLAND_MINIGRID_CACHE", os.path.expanduser("~/.xland_minigrid"))
 
 
-def build_cache(tiles: np.ndarray, tile_size: float = 32) -> tuple[np.ndarray, np.ndarray]:
-    cache = np.full((tiles.shape[0], tiles.shape[1], tile_size, tile_size, 3), dtype=np.uint8, fill_value=-1)
-    agent_cache = np.full((tiles.shape[0], tiles.shape[1], tile_size, tile_size, 3), dtype=np.uint8, fill_value=-1)
+def build_cache(tiles: np.ndarray, tile_size: int = 32) -> tuple[np.ndarray, np.ndarray]:
+    cache = np.zeros((tiles.shape[0], tiles.shape[1], tile_size, tile_size, 3), dtype=np.uint8)
+    agent_cache = np.zeros((tiles.shape[0], tiles.shape[1], tile_size, tile_size, 3), dtype=np.uint8)
 
     for y in range(tiles.shape[0]):
         for x in range(tiles.shape[1]):
