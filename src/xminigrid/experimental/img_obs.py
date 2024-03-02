@@ -48,6 +48,8 @@ TILE_SIZE = 32
 
 cache_path = os.path.join(CACHE_PATH, "render_cache")
 if not os.path.exists(cache_path):
+    os.makedirs(CACHE_PATH, exist_ok=True)
+
     TILE_CACHE, TILE_W_AGENT_CACHE = build_cache(np.asarray(TILES_REGISTRY), tile_size=TILE_SIZE)
     TILE_CACHE = jnp.asarray(TILE_CACHE).reshape(-1, TILE_SIZE, TILE_SIZE, 3)
     TILE_W_AGENT_CACHE = jnp.asarray(TILE_W_AGENT_CACHE).reshape(-1, TILE_SIZE, TILE_SIZE, 3)

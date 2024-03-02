@@ -7,7 +7,6 @@ python scripts/ruleset_generator.py \
   --total_rulesets=1_000_000 \
   --save_path="trivial_1m"
 
-
 # small
 python scripts/ruleset_generator.py \
   --prune_chain \

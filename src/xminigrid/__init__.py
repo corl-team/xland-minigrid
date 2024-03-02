@@ -210,7 +210,8 @@ register(
 
 # BlockedUnlockPickUp
 register(
-    id="MiniGrid-BlockedUnlockPickUp", entry_point="xminigrid.envs.minigrid.blockedunlockpickup:BlockedUnlockPickUp"
+    id="MiniGrid-BlockedUnlockPickUp",
+    entry_point="xminigrid.envs.minigrid.blockedunlockpickup:BlockedUnlockPickUp",
 )
 
 # DoorKey
