@@ -163,6 +163,7 @@ if __name__ == "__main__":
     if "XLand" in args.env_id:
         bench = xminigrid.load_benchmark(args.benchmark_id)
         env_params = env_params.replace(ruleset=bench.get_ruleset(args.ruleset_id))
+        assert hasattr(env_params, "ruleset")
         print_ruleset(env_params.ruleset)
         print()
 
