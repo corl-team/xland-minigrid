@@ -18,13 +18,12 @@ HF_REPO_ID = os.environ.get("XLAND_MINIGRID_HF_REPO_ID", "Howuhh/xland_minigrid"
 DATA_PATH = os.environ.get("XLAND_MINIGRID_DATA", os.path.expanduser("~/.xland_minigrid"))
 
 NAME2HFFILENAME = {
-    "trivial-1m": "trivial_1m",
-    "small-1m": "small_1m",
-    "small-dist-1m": "small_dist_1m",
-    "medium-1m": "medium_1m_v1",
-    "medium-3m": "medium_3m_v1",
-    "high-1m": "high_1m",
-    "high-3m": "high_3m",
+    "trivial-1m": "trivial_1m_v2",
+    "small-1m": "small_1m_v2",
+    "medium-1m": "medium_1m_v1_v2",
+    "medium-3m": "medium_3m_v1_v2",
+    "high-1m": "high_1m_v2",
+    "high-3m": "high_3m_v2",
 }
 
 

@@ -7,10 +7,11 @@ import pygame.freetype
 from pygame.event import Event
 
 import xminigrid
-from xminigrid.wrappers import GymAutoResetWrapper
 
 from .environment import Environment, EnvParamsT
+from .rendering.text_render import print_ruleset
 from .types import EnvCarryT
+from .wrappers import GymAutoResetWrapper
 
 
 class ManualControl:
@@ -162,6 +163,8 @@ if __name__ == "__main__":
     if "XLand" in args.env_id:
         bench = xminigrid.load_benchmark(args.benchmark_id)
         env_params = env_params.replace(ruleset=bench.get_ruleset(args.ruleset_id))
+        print_ruleset(env_params.ruleset)
+        print()
 
     control = ManualControl(env=env, env_params=env_params, agent_view=args.agent_view)
     control.start()
