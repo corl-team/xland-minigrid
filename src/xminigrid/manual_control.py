@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import os
 
-import imageio
+import imageio.v3 as iio
 import jax
 import numpy as np
 import pygame
@@ -167,7 +167,7 @@ class ManualControl:
         if self.save_video:
             assert self.video_path is not None
             save_path = os.path.join(self.video_path, "manual_control_rollout.mp4")
-            imageio.mimsave(save_path, self.frames, fps=8, format="mp4")
+            iio.imwrite(save_path, self.frames, format_hint=".mp4", fps=8)
 
 
 if __name__ == "__main__":

@@ -54,7 +54,7 @@ if not os.path.exists(cache_path):
     TILE_CACHE = jnp.asarray(TILE_CACHE).reshape(-1, TILE_SIZE, TILE_SIZE, 3)
     TILE_W_AGENT_CACHE = jnp.asarray(TILE_W_AGENT_CACHE).reshape(-1, TILE_SIZE, TILE_SIZE, 3)
 
-    print("Done. Cache will be reused on consequent runs.")
+    print(f"Done. Cache is saved to {cache_path} and will be reused on consequent runs.")
     save_bz2_pickle({"tile_cache": TILE_CACHE, "tile_agent_cache": TILE_W_AGENT_CACHE}, cache_path)
 
 TILE_CACHE = load_bz2_pickle(cache_path)["tile_cache"]
