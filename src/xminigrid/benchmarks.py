@@ -20,8 +20,8 @@ DATA_PATH = os.environ.get("XLAND_MINIGRID_DATA", os.path.expanduser("~/.xland_m
 NAME2HFFILENAME = {
     "trivial-1m": "trivial_1m_v2",
     "small-1m": "small_1m_v2",
-    "medium-1m": "medium_1m_v1_v2",
-    "medium-3m": "medium_3m_v1_v2",
+    "medium-1m": "medium_1m_v2",
+    "medium-3m": "medium_3m_v2",
     "high-1m": "high_1m_v2",
     "high-3m": "high_3m_v2",
 }
