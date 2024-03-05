@@ -1,5 +1,9 @@
-import argparse
+from __future__ import annotations
 
+import argparse
+import os
+
+import imageio
 import jax
 import numpy as np
 import pygame
@@ -9,17 +13,26 @@ from pygame.event import Event
 import xminigrid
 
 from .environment import Environment, EnvParamsT
-from .envs.xland import XLandEnvParams
 from .rendering.text_render import print_ruleset
 from .types import EnvCarryT
-from .wrappers import GymAutoResetWrapper
 
 
 class ManualControl:
-    def __init__(self, env: Environment[EnvParamsT, EnvCarryT], env_params: EnvParamsT, agent_view: bool = False):
+    def __init__(
+        self,
+        env: Environment[EnvParamsT, EnvCarryT],
+        env_params: EnvParamsT,
+        agent_view: bool = False,
+        save_video: bool = False,
+        video_path: str | None = None,
+    ):
         self.env = env
         self.env_params = env_params
         self.agent_view = agent_view
+        self.save_video = save_video
+        self.video_path = video_path
+        if self.save_video:
+            self.frames = []
 
         self._reset = jax.jit(self.env.reset)
         self._step = jax.jit(self.env.step)
@@ -40,6 +53,10 @@ class ManualControl:
             img = self.timestep.observation
         else:
             img = self.env.render(self.env_params, self.timestep)
+
+        if self.save_video:
+            self.frames.append(img)
+
         # [h, w, c] -> [w, h, c]
         img = np.transpose(img, axes=(1, 0, 2))
 
@@ -103,6 +120,9 @@ class ManualControl:
         )
         self.render()
 
+        if self.timestep.last():
+            self.reset()
+
     def reset(self) -> None:
         print("Reset!")
         self._key, reset_key = jax.random.split(self._key)
@@ -144,6 +164,11 @@ class ManualControl:
         if self.window:
             pygame.quit()
 
+        if self.save_video:
+            assert self.video_path is not None
+            save_path = os.path.join(self.video_path, "manual_control_rollout.mp4")
+            imageio.mimsave(save_path, self.frames, fps=8, format="mp4")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -151,10 +176,11 @@ if __name__ == "__main__":
     parser.add_argument("--benchmark-id", type=str, default="trivial-1m", choices=xminigrid.registered_benchmarks())
     parser.add_argument("--ruleset-id", type=int, default=0)
     parser.add_argument("--agent-view", action="store_true")
+    parser.add_argument("--save-video", action="store_true")
+    parser.add_argument("--video-path", type=str, default=".")
 
     args = parser.parse_args()
     env, env_params = xminigrid.make(args.env_id)
-    env = GymAutoResetWrapper(env)
 
     if args.agent_view:
         from xminigrid.experimental.img_obs import RGBImgObservationWrapper
@@ -169,5 +195,11 @@ if __name__ == "__main__":
         print_ruleset(ruleset)
         print()
 
-    control = ManualControl(env=env, env_params=env_params, agent_view=args.agent_view)
+    control = ManualControl(
+        env=env,
+        env_params=env_params,
+        agent_view=args.agent_view,
+        save_video=args.save_video,
+        video_path=args.video_path,
+    )
     control.start()
