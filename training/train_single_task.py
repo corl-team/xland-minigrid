@@ -29,6 +29,7 @@ class TrainConfig:
     group: str = "default"
     name: str = "single-task-ppo"
     env_id: str = "MiniGrid-Empty-6x6"
+    img_obs: bool = False
     # agent
     action_emb_dim: int = 16
     rnn_hidden_dim: int = 1024
@@ -74,6 +75,12 @@ def make_states(config: TrainConfig):
     env, env_params = xminigrid.make(config.env_id)
     env = GymAutoResetWrapper(env)
 
+    # enabling image observations if needed
+    if config.img_obs:
+        from xminigrid.experimental.img_obs import RGBImgObservationWrapper
+
+        env = RGBImgObservationWrapper(env)
+
     # setup training state
     rng = jax.random.PRNGKey(config.seed)
     rng, _rng = jax.random.split(rng)
@@ -84,6 +91,7 @@ def make_states(config: TrainConfig):
         rnn_hidden_dim=config.rnn_hidden_dim,
         rnn_num_layers=config.rnn_num_layers,
         head_hidden_dim=config.head_hidden_dim,
+        img_obs=config.img_obs,
     )
     # [batch_size, seq_len, ...]
     init_obs = {

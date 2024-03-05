@@ -100,23 +100,38 @@ class ActorCriticRNN(nn.Module):
     rnn_hidden_dim: int = 64
     rnn_num_layers: int = 1
     head_hidden_dim: int = 64
+    img_obs: bool = False
 
     @nn.compact
     def __call__(self, inputs: ActorCriticInput, hidden: jax.Array) -> tuple[distrax.Categorical, jax.Array, jax.Array]:
         B, S = inputs["observation"].shape[:2]
         # encoder from https://github.com/lcswillems/rl-starter-files/blob/master/model.py
-        img_encoder = nn.Sequential(
-            [
-                nn.Conv(16, (2, 2), padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
-                nn.relu,
-                # use this only for image sizes >= 7
-                # MaxPool2d((2, 2)),
-                nn.Conv(32, (2, 2), padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
-                nn.relu,
-                nn.Conv(64, (2, 2), padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
-                nn.relu,
-            ]
-        )
+        if self.img_obs:
+            # slight modification of NatureDQN CNN
+            img_encoder = nn.Sequential(
+                [
+                    nn.Conv(32, (8, 8), strides=4, padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
+                    nn.relu,
+                    nn.Conv(64, (4, 4), strides=3, padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
+                    nn.relu,
+                    nn.Conv(64, (3, 3), strides=2, padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
+                    nn.relu,
+                    nn.Conv(64, (2, 2), strides=1, padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
+                ]
+            )
+        else:
+            img_encoder = nn.Sequential(
+                [
+                    nn.Conv(16, (2, 2), padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
+                    nn.relu,
+                    # use this only for image sizes >= 7
+                    # MaxPool2d((2, 2)),
+                    nn.Conv(32, (2, 2), padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
+                    nn.relu,
+                    nn.Conv(64, (2, 2), padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
+                    nn.relu,
+                ]
+            )
         action_encoder = nn.Embed(self.num_actions, self.action_emb_dim)
 
         rnn_core = BatchedRNNModel(self.rnn_hidden_dim, self.rnn_num_layers)
