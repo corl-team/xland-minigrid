@@ -202,18 +202,18 @@ class TileNearUpRule(BaseRule):
         tile = grid[position[0], position[1]]
 
         def _rule_fn(grid):
-            empty_tile = TILES_REGISTRY[Tiles.EMPTY, Colors.EMPTY]
+            floor_tile = TILES_REGISTRY[Tiles.FLOOR, Colors.BLACK]
             y, x = position
             up, _, down, _ = get_neighbouring_tiles(grid, y, x)
 
             grid = jax.lax.select(
                 equal(tile, self.tile_b) & equal(down, self.tile_a),
-                grid.at[y + 1, x].set(self.prod_tile).at[y, x].set(empty_tile),
+                grid.at[y + 1, x].set(self.prod_tile).at[y, x].set(floor_tile),
                 grid,
             )
             grid = jax.lax.select(
                 equal(tile, self.tile_a) & equal(up, self.tile_b),
-                grid.at[y - 1, x].set(self.prod_tile).at[y, x].set(empty_tile),
+                grid.at[y - 1, x].set(self.prod_tile).at[y, x].set(floor_tile),
                 grid,
             )
             return grid
@@ -243,18 +243,19 @@ class TileNearRightRule(BaseRule):
         tile = grid[position[0], position[1]]
 
         def _rule_fn(grid):
-            empty_tile = TILES_REGISTRY[Tiles.EMPTY, Colors.EMPTY]
+            floor_tile = TILES_REGISTRY[Tiles.FLOOR, Colors.BLACK]
+
             y, x = position
             _, right, _, left = get_neighbouring_tiles(grid, y, x)
 
             grid = jax.lax.select(
                 equal(tile, self.tile_b) & equal(left, self.tile_a),
-                grid.at[y, x - 1].set(self.prod_tile).at[y, x].set(empty_tile),
+                grid.at[y, x - 1].set(self.prod_tile).at[y, x].set(floor_tile),
                 grid,
             )
             grid = jax.lax.select(
                 equal(tile, self.tile_a) & equal(right, self.tile_b),
-                grid.at[y, x + 1].set(self.prod_tile).at[y, x].set(empty_tile),
+                grid.at[y, x + 1].set(self.prod_tile).at[y, x].set(floor_tile),
                 grid,
             )
             return grid
@@ -284,18 +285,18 @@ class TileNearDownRule(BaseRule):
         tile = grid[position[0], position[1]]
 
         def _rule_fn(grid):
-            empty_tile = TILES_REGISTRY[Tiles.EMPTY, Colors.EMPTY]
+            floor_tile = TILES_REGISTRY[Tiles.FLOOR, Colors.BLACK]
             y, x = position
             up, _, down, _ = get_neighbouring_tiles(grid, y, x)
 
             grid = jax.lax.select(
                 equal(tile, self.tile_b) & equal(up, self.tile_a),
-                grid.at[y - 1, x].set(self.prod_tile).at[y, x].set(empty_tile),
+                grid.at[y - 1, x].set(self.prod_tile).at[y, x].set(floor_tile),
                 grid,
             )
             grid = jax.lax.select(
                 equal(tile, self.tile_a) & equal(down, self.tile_b),
-                grid.at[y + 1, x].set(self.prod_tile).at[y, x].set(empty_tile),
+                grid.at[y + 1, x].set(self.prod_tile).at[y, x].set(floor_tile),
                 grid,
             )
             return grid
@@ -325,18 +326,18 @@ class TileNearLeftRule(BaseRule):
         tile = grid[position[0], position[1]]
 
         def _rule_fn(grid):
-            empty_tile = TILES_REGISTRY[Tiles.EMPTY, Colors.EMPTY]
+            floor_tile = TILES_REGISTRY[Tiles.FLOOR, Colors.BLACK]
             y, x = position
             _, right, _, left = get_neighbouring_tiles(grid, y, x)
 
             grid = jax.lax.select(
                 equal(tile, self.tile_b) & equal(right, self.tile_a),
-                grid.at[y, x + 1].set(self.prod_tile).at[y, x].set(empty_tile),
+                grid.at[y, x + 1].set(self.prod_tile).at[y, x].set(floor_tile),
                 grid,
             )
             grid = jax.lax.select(
                 equal(tile, self.tile_a) & equal(left, self.tile_b),
-                grid.at[y, x - 1].set(self.prod_tile).at[y, x].set(empty_tile),
+                grid.at[y, x - 1].set(self.prod_tile).at[y, x].set(floor_tile),
                 grid,
             )
             return grid
