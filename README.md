@@ -93,6 +93,7 @@ On the high level, current API combines [dm_env](https://github.com/google-deepm
 import jax
 import xminigrid
 from xminigrid.wrappers import GymAutoResetWrapper
+from xminigrid.experimental.img_obs import RGBImgObservationWrapper
 
 key = jax.random.PRNGKey(0)
 reset_key, ruleset_key = jax.random.split(key)
@@ -108,6 +109,9 @@ env_params = env_params.replace(ruleset=ruleset)
 
 # auto-reset wrapper
 env = GymAutoResetWrapper(env)
+
+# render obs as rgb images if needed (warn: this will affect speed greatly)
+env = RGBImgObservationWrapper(env)
 
 # fully jit-compatible step and reset methods
 timestep = jax.jit(env.reset)(env_params, reset_key)

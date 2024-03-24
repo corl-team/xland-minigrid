@@ -175,7 +175,10 @@ class ManualControl:
             if self.video_format == ".mp4":
                 iio.imwrite(save_path, self.frames, format_hint=".mp4", fps=self.video_fps)
             elif self.video_format == ".gif":
-                iio.imwrite(save_path, self.frames, format_hint=".gif", duration=(1000 * 1 / self.video_fps), loop=10)
+                iio.imwrite(
+                    save_path, self.frames[:-1], format_hint=".gif", duration=(1000 * 1 / self.video_fps), loop=10
+                )
+                # iio.imwrite(save_path, self.frames, format_hint=".gif", duration=(1000 * 1 / self.video_fps), loop=10)
             else:
                 raise RuntimeError("Unknown video format! Should be one of ('.mp4', '.gif')")
 
@@ -189,7 +192,7 @@ if __name__ == "__main__":
     parser.add_argument("--save-video", action="store_true")
     parser.add_argument("--video-path", type=str, default=".")
     parser.add_argument("--video-format", type=str, default=".mp4", choices=(".mp4", ".gif"))
-    parser.add_argument("--video-fps", type=int, default=8)
+    parser.add_argument("--video-fps", type=int, default=5)
 
     args = parser.parse_args()
     env, env_params = xminigrid.make(args.env_id)

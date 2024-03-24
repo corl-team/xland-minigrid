@@ -107,16 +107,15 @@ class ActorCriticRNN(nn.Module):
         B, S = inputs["observation"].shape[:2]
         # encoder from https://github.com/lcswillems/rl-starter-files/blob/master/model.py
         if self.img_obs:
-            # slight modification of NatureDQN CNN
             img_encoder = nn.Sequential(
                 [
-                    nn.Conv(32, (8, 8), strides=4, padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
+                    nn.Conv(16, (3, 3), strides=2, padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
                     nn.relu,
-                    nn.Conv(64, (4, 4), strides=3, padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
+                    nn.Conv(32, (3, 3), strides=2, padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
                     nn.relu,
-                    nn.Conv(64, (3, 3), strides=2, padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
+                    nn.Conv(32, (3, 3), strides=2, padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
                     nn.relu,
-                    nn.Conv(64, (2, 2), strides=1, padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
+                    nn.Conv(32, (3, 3), strides=2, padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
                 ]
             )
         else:
