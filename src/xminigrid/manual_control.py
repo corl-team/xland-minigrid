@@ -1,5 +1,9 @@
-import argparse
+from __future__ import annotations
 
+import argparse
+import os
+
+import imageio.v3 as iio
 import jax
 import numpy as np
 import pygame
@@ -7,16 +11,33 @@ import pygame.freetype
 from pygame.event import Event
 
 import xminigrid
-from xminigrid.wrappers import GymAutoResetWrapper
 
 from .environment import Environment, EnvParamsT
+from .rendering.text_render import print_ruleset
 from .types import EnvCarryT
 
 
 class ManualControl:
-    def __init__(self, env: Environment[EnvParamsT, EnvCarryT], env_params: EnvParamsT):
+    def __init__(
+        self,
+        env: Environment[EnvParamsT, EnvCarryT],
+        env_params: EnvParamsT,
+        agent_view: bool = False,
+        save_video: bool = False,
+        video_path: str | None = None,
+        video_format: str = ".mp4",
+        video_fps: int = 8,
+    ):
         self.env = env
         self.env_params = env_params
+        self.agent_view = agent_view
+        self.save_video = save_video
+        self.video_path = video_path
+        self.video_format = video_format
+        self.video_fps = video_fps
+
+        if self.save_video:
+            self.frames = []
 
         self._reset = jax.jit(self.env.reset)
         self._step = jax.jit(self.env.step)
@@ -33,7 +54,14 @@ class ManualControl:
     def render(self) -> None:
         assert self.timestep is not None
 
-        img = self.env.render(self.env_params, self.timestep)
+        if self.agent_view:
+            img = self.timestep.observation
+        else:
+            img = self.env.render(self.env_params, self.timestep)
+
+        if self.save_video:
+            self.frames.append(img)
+
         # [h, w, c] -> [w, h, c]
         img = np.transpose(img, axes=(1, 0, 2))
 
@@ -97,6 +125,9 @@ class ManualControl:
         )
         self.render()
 
+        if self.timestep.last():
+            self.reset()
+
     def reset(self) -> None:
         print("Reset!")
         self._key, reset_key = jax.random.split(self._key)
@@ -138,20 +169,54 @@ class ManualControl:
         if self.window:
             pygame.quit()
 
+        if self.save_video:
+            assert self.video_path is not None
+            save_path = os.path.join(self.video_path, f"manual_control_rollout{self.video_format}")
+            if self.video_format == ".mp4":
+                iio.imwrite(save_path, self.frames, format_hint=".mp4", fps=self.video_fps)
+            elif self.video_format == ".gif":
+                iio.imwrite(
+                    save_path, self.frames[:-1], format_hint=".gif", duration=(1000 * 1 / self.video_fps), loop=10
+                )
+                # iio.imwrite(save_path, self.frames, format_hint=".gif", duration=(1000 * 1 / self.video_fps), loop=10)
+            else:
+                raise RuntimeError("Unknown video format! Should be one of ('.mp4', '.gif')")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--env-id", type=str, default="MiniGrid-Empty-5x5", choices=xminigrid.registered_environments())
     parser.add_argument("--benchmark-id", type=str, default="trivial-1m", choices=xminigrid.registered_benchmarks())
     parser.add_argument("--ruleset-id", type=int, default=0)
+    parser.add_argument("--agent-view", action="store_true")
+    parser.add_argument("--save-video", action="store_true")
+    parser.add_argument("--video-path", type=str, default=".")
+    parser.add_argument("--video-format", type=str, default=".mp4", choices=(".mp4", ".gif"))
+    parser.add_argument("--video-fps", type=int, default=5)
 
     args = parser.parse_args()
     env, env_params = xminigrid.make(args.env_id)
-    env = GymAutoResetWrapper(env)
+
+    if args.agent_view:
+        from xminigrid.experimental.img_obs import RGBImgObservationWrapper
+
+        env = RGBImgObservationWrapper(env)
 
     if "XLand" in args.env_id:
         bench = xminigrid.load_benchmark(args.benchmark_id)
-        env_params = env_params.replace(ruleset=bench.get_ruleset(args.ruleset_id))
+        ruleset = bench.get_ruleset(args.ruleset_id)
 
-    control = ManualControl(env=env, env_params=env_params)
+        env_params = env_params.replace(ruleset=ruleset)
+        print_ruleset(ruleset)
+        print()
+
+    control = ManualControl(
+        env=env,
+        env_params=env_params,
+        agent_view=args.agent_view,
+        save_video=args.save_video,
+        video_path=args.video_path,
+        video_format=args.video_format,
+        video_fps=args.video_fps,
+    )
     control.start()

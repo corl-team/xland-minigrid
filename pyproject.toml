@@ -38,6 +38,8 @@ dependencies = [
     "flax>=0.8.0",
     "rich>=13.4.2",
     "chex>=0.1.85",
+    "imageio>=2.31.2",
+    "imageio-ffmpeg>=0.4.9",
 ]
 
 [project.optional-dependencies]
@@ -49,8 +51,6 @@ dev = [
 
 baselines = [
     "matplotlib>=3.7.2",
-    "imageio>=2.31.2",
-    "imageio-ffmpeg>=0.4.9",
     "wandb>=0.15.10",
     "pyrallis>=0.3.1",
     "distrax>=0.1.4",

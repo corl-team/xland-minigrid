@@ -27,7 +27,6 @@ _empty_ruleset = RuleSet(
     init_tiles=jnp.array(((TILES_REGISTRY[Tiles.EMPTY, Colors.EMPTY],))),
 )
 
-_empty_tile = TILES_REGISTRY[Tiles.EMPTY, Colors.EMPTY]
 _wall_tile = TILES_REGISTRY[Tiles.WALL, Colors.GREY]
 # colors for doors between rooms
 _allowed_colors = jnp.array(

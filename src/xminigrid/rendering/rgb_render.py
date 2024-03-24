@@ -5,7 +5,7 @@ import math
 import numpy as np
 
 from ..core.constants import Colors, Tiles
-from ..types import AgentState, GridState, IntOrArray
+from ..types import AgentState, IntOrArray
 from .utils import (
     downsample,
     fill_coords,
@@ -18,6 +18,7 @@ from .utils import (
 )
 
 COLORS_MAP = {
+    Colors.EMPTY: np.array((255, 255, 255)),  # just a placeholder
     Colors.RED: np.array((255, 0, 0)),
     Colors.GREEN: np.array((0, 255, 0)),
     Colors.BLUE: np.array((0, 0, 255)),
@@ -30,6 +31,16 @@ COLORS_MAP = {
     Colors.BROWN: np.array((160, 82, 45)),
     Colors.PINK: np.array((225, 20, 147)),
 }
+
+
+def _render_empty(img: np.ndarray, color: int):
+    fill_coords(img, point_in_rect(0.45, 0.55, 0.2, 0.65), COLORS_MAP[Colors.RED])
+    fill_coords(img, point_in_rect(0.45, 0.55, 0.7, 0.85), COLORS_MAP[Colors.RED])
+
+    fill_coords(img, point_in_rect(0, 0.031, 0, 1), COLORS_MAP[Colors.RED])
+    fill_coords(img, point_in_rect(0, 1, 0, 0.031), COLORS_MAP[Colors.RED])
+    fill_coords(img, point_in_rect(1 - 0.031, 1, 0, 1), COLORS_MAP[Colors.RED])
+    fill_coords(img, point_in_rect(0, 1, 1 - 0.031, 1), COLORS_MAP[Colors.RED])
 
 
 def _render_floor(img: np.ndarray, color: int):
@@ -165,7 +176,7 @@ TILES_FN_MAP = {
     Tiles.DOOR_LOCKED: _render_door_locked,
     Tiles.DOOR_CLOSED: _render_door_closed,
     Tiles.DOOR_OPEN: _render_door_open,
-    Tiles.EMPTY: lambda img, color: img,
+    Tiles.EMPTY: _render_empty,
 }
 
 
@@ -196,7 +207,7 @@ def get_highlight_mask(grid: np.ndarray, agent: AgentState | None, view_size: in
 
 @functools.cache
 def render_tile(
-    tile: np.ndarray, agent_direction: int | None = None, highlight: bool = False, tile_size: int = 32, subdivs: int = 3
+    tile: tuple, agent_direction: int | None = None, highlight: bool = False, tile_size: int = 32, subdivs: int = 3
 ) -> np.ndarray:
     img = np.full((tile_size * subdivs, tile_size * subdivs, 3), dtype=np.uint8, fill_value=255)
     # draw tile

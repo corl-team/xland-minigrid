@@ -18,14 +18,24 @@ NUM_ENVS = (128, 256, 512, 1024, 2048, 4096, 8192, 16384)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--benchmark-id", type=str, default="trivial-1m")
+parser.add_argument("--img-obs", action="store_true")
 parser.add_argument("--timesteps", type=int, default=1000)
 parser.add_argument("--num-repeat", type=int, default=10, help="Number of timing repeats")
 parser.add_argument("--num-iter", type=int, default=1, help="Number of runs during one repeat (time is summed)")
 
 
-def build_benchmark(env_id: str, num_envs: int, timesteps: int, benchmark_id: Optional[str] = None):
+def build_benchmark(
+    env_id: str, num_envs: int, timesteps: int, benchmark_id: Optional[str] = None, img_obs: bool = False
+):
     env, env_params = xminigrid.make(env_id)
     env = GymAutoResetWrapper(env)
+
+    # enable img observations if needed
+    if img_obs:
+        from xminigrid.experimental.img_obs import RGBImgObservationWrapper
+
+        env = RGBImgObservationWrapper(env)
+
     # choose XLand benchmark if needed
     if "XLand-MiniGrid" in env_id and benchmark_id is not None:
         ruleset = load_benchmark(benchmark_id).sample_ruleset(jax.random.PRNGKey(0))
@@ -77,7 +87,9 @@ if __name__ == "__main__":
         for env_id in tqdm(environments, desc="Envs.."):
             assert num_envs % num_devices == 0
             # building pmap for multi-gpu benchmarking (each doing (num_envs / num_devices) vmaps)
-            benchmark_fn_pmap = build_benchmark(env_id, num_envs // num_devices, args.timesteps, args.benchmark_id)
+            benchmark_fn_pmap = build_benchmark(
+                env_id, num_envs // num_devices, args.timesteps, args.benchmark_id, args.img_obs
+            )
             benchmark_fn_pmap = jax.pmap(benchmark_fn_pmap)
 
             # benchmarking

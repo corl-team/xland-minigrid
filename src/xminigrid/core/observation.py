@@ -12,7 +12,7 @@ def crop_field_of_view(grid: GridState, agent: AgentState, height: int, width: i
     grid = jnp.pad(
         grid,
         pad_width=((height, height), (width, width), (0, 0)),
-        constant_values=Tiles.END_OF_MAP,
+        constant_values=Tiles.EMPTY,
     )
     # account for padding
     y = agent.position[0] + height
@@ -110,8 +110,8 @@ def minigrid_field_of_view(grid: GridState, agent: AgentState, height: int, widt
     fov_grid = crop_field_of_view(grid, agent, height, width)
     fov_grid = align_with_up(fov_grid, agent.direction)
     mask = generate_viz_mask_minigrid(fov_grid)
-    # set UNSEEN value for all layers (including colors, as UNSEEN color has same id value)
-    fov_grid = jnp.where(mask[..., None], fov_grid, Tiles.UNSEEN)
+    # set EMPTY as unseen value for all layers (including colors, as EMPTY color has same id value)
+    fov_grid = jnp.where(mask[..., None], fov_grid, Tiles.EMPTY)
 
     # TODO: should we even do this? Agent with good memory can remember what he picked up.
     # WARN: this can overwrite tile the agent is on, GOAL for example.

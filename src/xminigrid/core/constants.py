@@ -1,48 +1,44 @@
 import jax.numpy as jnp
 from flax import struct
 
-# GRID: [tile, color]
-NUM_LAYERS = 2
-NUM_TILES = 15
-NUM_COLORS = 14
 NUM_ACTIONS = 6
 
+# GRID: [tile, color]
+NUM_LAYERS = 2
+NUM_TILES = 13
+NUM_COLORS = 12
 
-# TODO: do we really need END_OF_MAP? seem like unseen can be used instead...
+
 # enums, kinda...
 class Tiles(struct.PyTreeNode):
     EMPTY: int = struct.field(pytree_node=False, default=0)
-    END_OF_MAP: int = struct.field(pytree_node=False, default=1)
-    UNSEEN: int = struct.field(pytree_node=False, default=2)
-    FLOOR: int = struct.field(pytree_node=False, default=3)
-    WALL: int = struct.field(pytree_node=False, default=4)
-    BALL: int = struct.field(pytree_node=False, default=5)
-    SQUARE: int = struct.field(pytree_node=False, default=6)
-    PYRAMID: int = struct.field(pytree_node=False, default=7)
-    GOAL: int = struct.field(pytree_node=False, default=8)
-    KEY: int = struct.field(pytree_node=False, default=9)
-    DOOR_LOCKED: int = struct.field(pytree_node=False, default=10)
-    DOOR_CLOSED: int = struct.field(pytree_node=False, default=11)
-    DOOR_OPEN: int = struct.field(pytree_node=False, default=12)
-    HEX: int = struct.field(pytree_node=False, default=13)
-    STAR: int = struct.field(pytree_node=False, default=14)
+    FLOOR: int = struct.field(pytree_node=False, default=1)
+    WALL: int = struct.field(pytree_node=False, default=2)
+    BALL: int = struct.field(pytree_node=False, default=3)
+    SQUARE: int = struct.field(pytree_node=False, default=4)
+    PYRAMID: int = struct.field(pytree_node=False, default=5)
+    GOAL: int = struct.field(pytree_node=False, default=6)
+    KEY: int = struct.field(pytree_node=False, default=7)
+    DOOR_LOCKED: int = struct.field(pytree_node=False, default=8)
+    DOOR_CLOSED: int = struct.field(pytree_node=False, default=9)
+    DOOR_OPEN: int = struct.field(pytree_node=False, default=10)
+    HEX: int = struct.field(pytree_node=False, default=11)
+    STAR: int = struct.field(pytree_node=False, default=12)
 
 
 class Colors(struct.PyTreeNode):
     EMPTY: int = struct.field(pytree_node=False, default=0)
-    END_OF_MAP: int = struct.field(pytree_node=False, default=1)
-    UNSEEN: int = struct.field(pytree_node=False, default=2)
-    RED: int = struct.field(pytree_node=False, default=3)
-    GREEN: int = struct.field(pytree_node=False, default=4)
-    BLUE: int = struct.field(pytree_node=False, default=5)
-    PURPLE: int = struct.field(pytree_node=False, default=6)
-    YELLOW: int = struct.field(pytree_node=False, default=7)
-    GREY: int = struct.field(pytree_node=False, default=8)
-    BLACK: int = struct.field(pytree_node=False, default=9)
-    ORANGE: int = struct.field(pytree_node=False, default=10)
-    WHITE: int = struct.field(pytree_node=False, default=11)
-    BROWN: int = struct.field(pytree_node=False, default=12)
-    PINK: int = struct.field(pytree_node=False, default=13)
+    RED: int = struct.field(pytree_node=False, default=1)
+    GREEN: int = struct.field(pytree_node=False, default=2)
+    BLUE: int = struct.field(pytree_node=False, default=3)
+    PURPLE: int = struct.field(pytree_node=False, default=4)
+    YELLOW: int = struct.field(pytree_node=False, default=5)
+    GREY: int = struct.field(pytree_node=False, default=6)
+    BLACK: int = struct.field(pytree_node=False, default=7)
+    ORANGE: int = struct.field(pytree_node=False, default=8)
+    WHITE: int = struct.field(pytree_node=False, default=9)
+    BROWN: int = struct.field(pytree_node=False, default=10)
+    PINK: int = struct.field(pytree_node=False, default=11)
 
 
 # Only ~100 combinations so far, better to preallocate them
@@ -65,7 +61,6 @@ DIRECTIONS = jnp.array(
 
 WALKABLE = jnp.array(
     (
-        Tiles.EMPTY,
         Tiles.FLOOR,
         Tiles.GOAL,
         Tiles.DOOR_OPEN,
@@ -83,12 +78,7 @@ PICKABLE = jnp.array(
     )
 )
 
-FREE_TO_PUT_DOWN = jnp.array(
-    (
-        Tiles.EMPTY,
-        Tiles.FLOOR,
-    )
-)
+FREE_TO_PUT_DOWN = jnp.array((Tiles.FLOOR,))
 
 LOS_BLOCKING = jnp.array(
     (
