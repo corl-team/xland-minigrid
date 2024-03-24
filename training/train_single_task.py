@@ -4,6 +4,7 @@
 import time
 from dataclasses import asdict, dataclass
 from functools import partial
+from typing import Optional
 
 import jax
 import jax.numpy as jnp
@@ -29,6 +30,8 @@ class TrainConfig:
     group: str = "default"
     name: str = "single-task-ppo"
     env_id: str = "MiniGrid-Empty-6x6"
+    benchmark_id: Optional[str] = None
+    ruleset_id: Optional[int] = None
     img_obs: bool = False
     # agent
     action_emb_dim: int = 16
@@ -69,11 +72,15 @@ def make_states(config: TrainConfig):
         return config.lr * frac
 
     # setup environment
-    if "XLand-MiniGrid" in config.env_id:
-        raise ValueError("Only single-task environments are supported.")
-
     env, env_params = xminigrid.make(config.env_id)
     env = GymAutoResetWrapper(env)
+
+    # for single-task XLand environments
+    if config.benchmark_id is not None:
+        assert "XLand-MiniGrid" in config.env_id, "Benchmarks should be used only with XLand environments."
+        assert config.ruleset_id is not None, "Ruleset ID should be specified for benchmarks usage."
+        benchmark = xminigrid.load_benchmark(config.benchmark_id)
+        env_params = env_params.replace(ruleset=benchmark.get_ruleset(config.ruleset_id))
 
     # enabling image observations if needed
     if config.img_obs:
