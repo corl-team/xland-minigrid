@@ -250,7 +250,7 @@ def render(
                 agent_direction = None
 
             tile_img = render_tile(
-                tile=tuple(grid[y, x]),
+                tile=tuple(grid[y, x].tolist()),
                 agent_direction=agent_direction,
                 highlight=highlight_mask[y, x],
                 tile_size=int(tile_size),
