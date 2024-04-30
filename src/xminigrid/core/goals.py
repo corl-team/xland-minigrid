@@ -10,6 +10,7 @@ from ..types import AgentState, GridState
 from .grid import equal, get_neighbouring_tiles, pad_along_axis
 
 MAX_GOAL_ENCODING_LEN = 4 + 1  # for idx
+NUM_GOALS = 15
 
 
 def check_goal(

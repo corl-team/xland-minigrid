@@ -116,12 +116,10 @@ class ManualControl:
     def step(self, action: int) -> None:
         self.timestep = self._step(self.env_params, self.timestep, action)
         print(
-            "StepType: ",
-            self.timestep.step_type,
-            "Discount: ",
-            self.timestep.discount,
-            "Reward: ",
-            self.timestep.reward,
+            f"Step: {self.timestep.state.step_num} | ",
+            f"StepType: {self.timestep.step_type} | ",
+            f"Discount: {self.timestep.discount} | ",
+            f"Reward: {self.timestep.reward}",
         )
         self.render()
 
@@ -135,12 +133,10 @@ class ManualControl:
         self.timestep = self._reset(self.env_params, reset_key)
         self.render()
         print(
-            "StepType: ",
-            self.timestep.step_type,
-            "Discount: ",
-            self.timestep.discount,
-            "Reward: ",
-            self.timestep.reward,
+            f"Step: {self.timestep.state.step_num} |",
+            f"StepType: {self.timestep.step_type} |",
+            f"Discount: {self.timestep.discount} |",
+            f"Reward: {self.timestep.reward}",
         )
 
     def key_handler(self, event: Event) -> None:

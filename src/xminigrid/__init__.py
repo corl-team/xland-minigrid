@@ -2,7 +2,7 @@ from .benchmarks import load_benchmark, registered_benchmarks
 from .registration import make, register, registered_environments
 
 # TODO: add __all__
-__version__ = "0.7.0"
+__version__ = "0.7.1"
 
 # ---------- XLand-MiniGrid environments ----------
 

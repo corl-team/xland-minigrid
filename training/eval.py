@@ -15,14 +15,14 @@ TOTAL_EPISODES = 10
 
 def main():
     orbax_checkpointer = orbax.checkpoint.PyTreeCheckpointer()
-    checkpoint = orbax_checkpointer.restore("../xland-minigrid-data/XLand-MiniGrid-R1-9x9-Trivial-v0-5B-gamma99")
+    checkpoint = orbax_checkpointer.restore("../xland-minigrid-data/checkpoints")
     config = checkpoint["config"]
     params = checkpoint["params"]
 
     env, env_params = xminigrid.make("XLand-MiniGrid-R1-9x9")
     env = GymAutoResetWrapper(env)
 
-    ruleset = xminigrid.load_benchmark("Trivial").get_ruleset(3)
+    ruleset = xminigrid.load_benchmark("trivial-1m").get_ruleset(3)
     env_params = env_params.replace(ruleset=ruleset)
 
     model = ActorCriticRNN(
