@@ -11,6 +11,7 @@ from .constants import TILES_REGISTRY, Colors, Tiles
 from .grid import equal, get_neighbouring_tiles, pad_along_axis
 
 MAX_RULE_ENCODING_LEN = 6 + 1  # +1 for idx
+NUM_RULES = 12
 
 
 # this is very costly, will evaluate all rules under vmap. Submit a PR if you know how to do it better!

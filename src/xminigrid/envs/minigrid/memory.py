@@ -109,7 +109,7 @@ class Memory(Environment[EnvParams, MemoryEnvCarry]):
         self, params: EnvParams, timestep: TimeStep[MemoryEnvCarry], action: IntOrArray
     ) -> TimeStep[MemoryEnvCarry]:
         # disabling pick_up action
-        action = jax.lax.select(jnp.equal(action, 3), 5, action)
+        action = jax.lax.select(jnp.equal(action, 3), jnp.asarray(5, dtype=jnp.uint8), action)
         new_grid, new_agent, _ = take_action(timestep.state.grid, timestep.state.agent, action)
 
         new_state = timestep.state.replace(grid=new_grid, agent=new_agent, step_num=timestep.state.step_num + 1)
