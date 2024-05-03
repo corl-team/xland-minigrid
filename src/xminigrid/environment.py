@@ -73,6 +73,8 @@ class Environment(abc.ABC, Generic[EnvParamsT, EnvCarryT]):
 
         # checking for termination or truncation, choosing step type
         terminated = check_goal(new_state.goal_encoding, new_state.grid, new_state.agent, action, changed_position)
+
+        assert params.max_steps is not None
         truncated = jnp.equal(new_state.step_num, params.max_steps)
 
         reward = jax.lax.select(terminated, 1.0 - 0.9 * (new_state.step_num / params.max_steps), 0.0)
