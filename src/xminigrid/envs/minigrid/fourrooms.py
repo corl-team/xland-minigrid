@@ -17,13 +17,13 @@ _rule_encoding = EmptyRule().encode()[None, ...]
 
 class FourRooms(Environment[EnvParams, EnvCarry]):
     def default_params(self, **kwargs) -> EnvParams:
-        default_params = EnvParams(height=19, width=19)
-        default_params = default_params.replace(**kwargs)
-        return default_params
+        params = EnvParams(height=19, width=19)
+        params = params.replace(**kwargs)
 
-    def time_limit(self, params: EnvParams) -> int:
-        # TODO: this is hardcoded and thus problematic. Move it to EnvParams?
-        return 100
+        if params.max_steps is None:
+            # formula directly taken from MiniGrid
+            params = params.replace(max_steps=100)
+        return params
 
     def _generate_problem(self, params: EnvParams, key: jax.Array) -> State[EnvCarry]:
         key, *keys = jax.random.split(key, num=4)

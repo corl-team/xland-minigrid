@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import abc
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic, Optional, TypeVar
 
 import jax
 import jax.numpy as jnp
@@ -26,6 +26,7 @@ class EnvParams(struct.PyTreeNode):
     height: int = struct.field(pytree_node=False, default=9)
     width: int = struct.field(pytree_node=False, default=9)
     view_size: int = struct.field(pytree_node=False, default=7)
+    max_steps: Optional[None] = struct.field(pytree_node=False, default=None)
     render_mode: str = struct.field(pytree_node=False, default="rgb_array")
 
 
@@ -42,10 +43,6 @@ class Environment(abc.ABC, Generic[EnvParamsT, EnvCarryT]):
 
     def observation_shape(self, params: EnvParamsT) -> tuple[int, int, int]:
         return params.view_size, params.view_size, NUM_LAYERS
-
-    # TODO: NOT sure that this should be hardcoded like that...
-    def time_limit(self, params: EnvParamsT) -> int:
-        return 3 * params.height * params.width
 
     @abc.abstractmethod
     def _generate_problem(self, params: EnvParamsT, key: jax.Array) -> State[EnvCarryT]:
@@ -76,9 +73,9 @@ class Environment(abc.ABC, Generic[EnvParamsT, EnvCarryT]):
 
         # checking for termination or truncation, choosing step type
         terminated = check_goal(new_state.goal_encoding, new_state.grid, new_state.agent, action, changed_position)
-        truncated = jnp.equal(new_state.step_num, self.time_limit(params))
+        truncated = jnp.equal(new_state.step_num, params.max_steps)
 
-        reward = jax.lax.select(terminated, 1.0 - 0.9 * (new_state.step_num / self.time_limit(params)), 0.0)
+        reward = jax.lax.select(terminated, 1.0 - 0.9 * (new_state.step_num / params.max_steps), 0.0)
 
         step_type = jax.lax.select(terminated | truncated, StepType.LAST, StepType.MID)
         discount = jax.lax.select(terminated, jnp.asarray(0.0), jnp.asarray(1.0))

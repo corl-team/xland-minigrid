@@ -144,14 +144,15 @@ class XLandEnvParams(EnvParams):
 
 class XLandMiniGrid(Environment[XLandEnvParams, EnvCarry]):
     def default_params(self, **kwargs) -> XLandEnvParams:
-        default_params = XLandEnvParams(view_size=5)
-        return default_params.replace(**kwargs)
+        params = XLandEnvParams(view_size=5)
+        params = params.replace(**kwargs)
 
-    def time_limit(self, params: XLandEnvParams) -> int:
-        # this is just a heuristic to prevent brute force in one episode,
-        # agent need to remember what he tried in previous episodes.
-        # If this is too small, change it or increase number of trials (these are not equivalent).
-        return 3 * (params.height * params.width)
+        if params.max_steps is None:
+            # this is just a heuristic to prevent brute force in one episode,
+            # so that agent need to remember what he tried in previous episodes.
+            # If this is too small, change it or increase number of trials (NB: these are not equivalent).
+            params = params.replace(max_steps=4 * (params.height * params.width))
+        return params
 
     def _generate_problem(self, params: XLandEnvParams, key: jax.Array) -> State[EnvCarry]:
         # WARN: we can make this compatible with jit (to vmap on different layouts during training),

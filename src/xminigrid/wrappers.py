@@ -22,9 +22,6 @@ class Wrapper(Environment[EnvParamsT, EnvCarryT]):
     def observation_shape(self, params: EnvParamsT) -> tuple[int, int, int]:
         return self._env.observation_shape(params)
 
-    def time_limit(self, params: EnvParamsT) -> int:
-        return self._env.time_limit(params)
-
     def _generate_problem(self, params: EnvParamsT, key: jax.Array) -> State[EnvCarryT]:
         return self._env._generate_problem(params, key)
 
