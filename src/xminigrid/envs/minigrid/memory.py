@@ -39,12 +39,13 @@ class MemoryEnvCarry(struct.PyTreeNode):
 # TODO: Random corridor length is a bit problematic due to the dynamic slicing.
 class Memory(Environment[EnvParams, MemoryEnvCarry]):
     def default_params(self, **kwargs) -> EnvParams:
-        default_params = EnvParams(height=7, width=13, view_size=3)
-        default_params = default_params.replace(**kwargs)
-        return default_params
+        params = EnvParams(height=7, width=13, view_size=3)
+        params = params.replace(**kwargs)
 
-    def time_limit(self, params: EnvParams) -> int:
-        return 5 * params.width**2
+        if params.max_steps is None:
+            # formula directly taken from MiniGrid
+            params = params.replace(max_steps=5 * params.width**2)
+        return params
 
     def _generate_problem(self, params: EnvParams, key: jax.Array) -> State[MemoryEnvCarry]:
         key, corridor_key, agent_key, mem_key, place_key = jax.random.split(key, num=5)
@@ -115,14 +116,14 @@ class Memory(Environment[EnvParams, MemoryEnvCarry]):
         new_state = timestep.state.replace(grid=new_grid, agent=new_agent, step_num=timestep.state.step_num + 1)
         new_observation = transparent_field_of_view(new_state.grid, new_state.agent, params.view_size, params.view_size)
 
-        truncated = new_state.step_num == self.time_limit(params)
+        truncated = new_state.step_num == params.max_steps
         terminated = jnp.logical_or(
             jnp.array_equal(new_agent.position, new_state.carry.success_pos),
             jnp.array_equal(new_agent.position, new_state.carry.failure_pos),
         )
         reward = jax.lax.select(
             jnp.array_equal(new_agent.position, new_state.carry.success_pos),
-            1.0 - 0.9 * (new_state.step_num / self.time_limit(params)),
+            1.0 - 0.9 * (new_state.step_num / params.max_steps),
             0.0,
         )
         step_type = jax.lax.select(terminated | truncated, StepType.LAST, StepType.MID)

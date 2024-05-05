@@ -45,10 +45,13 @@ class PlaygroundEnvParams(EnvParams):
 
 class Playground(Environment[PlaygroundEnvParams, EnvCarry]):
     def default_params(self, **kwargs) -> PlaygroundEnvParams:
-        return PlaygroundEnvParams(height=19, width=19).replace(**kwargs)
+        params = PlaygroundEnvParams(height=19, width=19)
+        params = params.replace(**kwargs)
 
-    def time_limit(self, params: EnvParams) -> int:
-        return 512
+        if params.max_steps is None:
+            # formula directly taken from MiniGrid
+            params = params.replace(max_steps=512)
+        return params
 
     def _generate_problem(self, params: PlaygroundEnvParams, key: jax.Array) -> State[EnvCarry]:
         key, *keys = jax.random.split(key, num=6)

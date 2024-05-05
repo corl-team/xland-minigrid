@@ -16,12 +16,13 @@ _rule_encoding = EmptyRule().encode()[None, ...]
 
 class DoorKey(Environment[EnvParams, EnvCarry]):
     def default_params(self, **kwargs) -> EnvParams:
-        default_params = EnvParams(height=5, width=5)
-        default_params = default_params.replace(**kwargs)
-        return default_params
+        params = EnvParams(height=5, width=5)
+        params = params.replace(**kwargs)
 
-    def time_limit(self, params: EnvParams) -> int:
-        return 10 * (params.height * params.width)
+        if params.max_steps is None:
+            # formula directly taken from MiniGrid
+            params = params.replace(max_steps=10 * (params.height * params.width))
+        return params
 
     def _generate_problem(self, params: EnvParams, key: jax.Array) -> State[EnvCarry]:
         key, _key = jax.random.split(key)

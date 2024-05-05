@@ -30,12 +30,13 @@ _allowed_colors = jnp.array(
 
 class LockedRoom(Environment[EnvParams, EnvCarry]):
     def default_params(self, **kwargs) -> EnvParams:
-        default_params = EnvParams(height=19, width=19)
-        default_params = default_params.replace(**kwargs)
-        return default_params
+        params = EnvParams(height=19, width=19)
+        params = params.replace(**kwargs)
 
-    def time_limit(self, params: EnvParams) -> int:
-        return 10 * params.height
+        if params.max_steps is None:
+            # formula directly taken from MiniGrid
+            params = params.replace(max_steps=10 * params.height)
+        return params
 
     def _generate_problem(self, params: EnvParams, key: jax.Array) -> State[EnvCarry]:
         key, rooms_key, colors_key, objects_key, coords_key, agent_pos_key, agent_dir_key = jax.random.split(key, num=7)
