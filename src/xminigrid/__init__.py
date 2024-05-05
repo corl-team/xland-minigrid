@@ -91,11 +91,27 @@ register(
 )
 
 register(
+    id="XLand-MiniGrid-R1-11x11",
+    entry_point="xminigrid.envs.xland:XLandMiniGrid",
+    grid_type="R1",
+    height=11,
+    width=11,
+)
+
+register(
     id="XLand-MiniGrid-R1-13x13",
     entry_point="xminigrid.envs.xland:XLandMiniGrid",
     grid_type="R1",
     height=13,
     width=13,
+)
+
+register(
+    id="XLand-MiniGrid-R1-15x15",
+    entry_point="xminigrid.envs.xland:XLandMiniGrid",
+    grid_type="R1",
+    height=15,
+    width=15,
 )
 
 register(
@@ -116,11 +132,27 @@ register(
 )
 
 register(
+    id="XLand-MiniGrid-R2-11x11",
+    entry_point="xminigrid.envs.xland:XLandMiniGrid",
+    grid_type="R2",
+    height=11,
+    width=11,
+)
+
+register(
     id="XLand-MiniGrid-R2-13x13",
     entry_point="xminigrid.envs.xland:XLandMiniGrid",
     grid_type="R2",
     height=13,
     width=13,
+)
+
+register(
+    id="XLand-MiniGrid-R2-15x15",
+    entry_point="xminigrid.envs.xland:XLandMiniGrid",
+    grid_type="R2",
+    height=15,
+    width=15,
 )
 
 register(
@@ -141,11 +173,27 @@ register(
 )
 
 register(
+    id="XLand-MiniGrid-R4-11x11",
+    entry_point="xminigrid.envs.xland:XLandMiniGrid",
+    grid_type="R4",
+    height=11,
+    width=11,
+)
+
+register(
     id="XLand-MiniGrid-R4-13x13",
     entry_point="xminigrid.envs.xland:XLandMiniGrid",
     grid_type="R4",
     height=13,
     width=13,
+)
+
+register(
+    id="XLand-MiniGrid-R4-15x15",
+    entry_point="xminigrid.envs.xland:XLandMiniGrid",
+    grid_type="R4",
+    height=15,
+    width=15,
 )
 
 register(

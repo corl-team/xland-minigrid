@@ -151,7 +151,7 @@ class XLandMiniGrid(Environment[XLandEnvParams, EnvCarry]):
             # this is just a heuristic to prevent brute force in one episode,
             # so that agent need to remember what he tried in previous episodes.
             # If this is too small, change it or increase number of trials (NB: these are not equivalent).
-            params = params.replace(max_steps=4 * (params.height * params.width))
+            params = params.replace(max_steps=3 * (params.height * params.width))
         return params
 
     def _generate_problem(self, params: XLandEnvParams, key: jax.Array) -> State[EnvCarry]:
