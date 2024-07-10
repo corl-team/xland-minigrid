@@ -74,6 +74,8 @@ class DmEnvAutoResetWrapper(Wrapper):
 # Yes, these are a bit stupid, but a tmp workaround to not write an actual system for spaces.
 # May be, in the future, I will port the entire API to some existing one, like functional Gymnasium.
 # For now, faster to do this stuff with dicts instead...
+# NB: if you do not want to use this (due to the dicts as obs),
+# just get needed parts from the original TimeStep and State dataclasses
 class DirectionObsWrapper(Wrapper):
     def observation_shape(self, params):
         base_shape = self._env.observation_shape(params)
