@@ -73,23 +73,16 @@ class DmEnvAutoResetWrapper(Wrapper):
 
 class DirectionObsWrapper(Wrapper):
     def observation_shape(self, params):
-        # base_shape = self._env.observation_shape(params)
-        base_shape = {
-            "img": self._env.observation_shape(params),
-            "direction": 4,
-        }
-        # if not isinstance(base_shape, dict):
-        #     assert isinstance(base_shape, tuple)
-        #     assert len(base_shape) == 3
-        #     base_shape = {
-        #         "img": base_shape,
-        #     }
-        #
-        # assert "img" in base_shape
-        # assert not isinstance(base_shape, tuple)
-        # base_shape.update(direction=4)
-
-        return base_shape
+        base_shape = self._env.observation_shape(params)
+        if isinstance(base_shape, dict):
+            assert "img" in base_shape
+            obs_shape = {**base_shape, **{"direction": 4}}
+        else:
+            obs_shape = {
+                "img": self._env.observation_shape(params),
+                "direction": 4,
+            }
+        return obs_shape
 
     def __extend_obs(self, timestep):
         extended_obs = {
