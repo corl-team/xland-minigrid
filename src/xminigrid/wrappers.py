@@ -71,6 +71,9 @@ class DmEnvAutoResetWrapper(Wrapper):
         return timestep
 
 
+# Yes, these are a bit stupid, but a tmp workaround to not write an actual system for spaces.
+# May be, in the future, I will port the entire API to some existing one, like functional Gymnasium.
+# For now, faster to do this stuff with dicts instead...
 class DirectionObsWrapper(Wrapper):
     def observation_shape(self, params):
         base_shape = self._env.observation_shape(params)
@@ -85,10 +88,19 @@ class DirectionObsWrapper(Wrapper):
         return obs_shape
 
     def __extend_obs(self, timestep):
-        extended_obs = {
-            "img": timestep.observation,
-            "direction": jax.nn.one_hot(timestep.state.agent.direction, num_classes=4),
-        }
+        direction = jax.nn.one_hot(timestep.state.agent.direction, num_classes=4)
+        if isinstance(timestep.observation, dict):
+            assert "img" in timestep.observation
+            extended_obs = {
+                **timestep.observation,
+                **{"direction": direction},
+            }
+        else:
+            extended_obs = {
+                "img": timestep.observation,
+                "direction": direction,
+            }
+
         timestep = timestep.replace(observation=extended_obs)
         return timestep
 
@@ -103,32 +115,54 @@ class DirectionObsWrapper(Wrapper):
         return timestep
 
 
-# class ExtendedObsWrapper(Wrapper):
-#     # TODO: fix typing for the observation shape
-#     def observation_shape(self, params):
-#         return {
-#             "img": self._env.observation_shape(params),
-#             "direction": 4,
-#             "goal_encoding": params.state.goal_encoding.shape,
-#             "rule_encoding": params.state.rule_encoding.shape,
-#         }
-#
-#     def __extend_obs(self, timestep):
-#         extended_obs = {
-#             "img": timestep.observation,
-#             "direction": jax.nn.one_hot(timestep.state.agent.direction, num_classes=4),
-#             "goal_encoding": timestep.state.goal_encoding,
-#             "rule_encoding": timestep.state.rule_encoding,
-#         }
-#         timestep = timestep.replace(observation=extended_obs)
-#         return timestep
-#
-#     def reset(self, params, key):
-#         timestep = self._env.reset(params, key)
-#         timestep = self.__extend_obs(timestep)
-#         return timestep
-#
-#     def step(self, params, timestep, action):
-#         timestep = self._env.step(params, timestep, action)
-#         timestep = self.__extend_obs(timestep)
-#         return timestep
+class RulesAndGoalsObsWrapper(Wrapper):
+    def observation_shape(self, params):
+        base_shape = self._env.observation_shape(params)
+        if isinstance(base_shape, dict):
+            assert "img" in base_shape
+            obs_shape = {
+                **base_shape,
+                **{
+                    "goal_encoding": params.state.goal_encoding.shape,
+                    "rule_encoding": params.state.rule_encoding.shape,
+                },
+            }
+        else:
+            obs_shape = {
+                "img": self._env.observation_shape(params),
+                "goal_encoding": params.state.goal_encoding.shape,
+                "rule_encoding": params.state.rule_encoding.shape,
+            }
+        return obs_shape
+
+    def __extend_obs(self, timestep):
+        goal_encoding = timestep.state.goal_encoding
+        rule_encoding = timestep.state.rule_encoding
+        if isinstance(timestep.observation, dict):
+            assert "img" in timestep.observation
+            extended_obs = {
+                **timestep.observation,
+                **{
+                    "goal_encoding": goal_encoding,
+                    "rule_encoding": rule_encoding,
+                },
+            }
+        else:
+            extended_obs = {
+                "img": timestep.observation,
+                "goal_encoding": goal_encoding,
+                "rule_encoding": rule_encoding,
+            }
+
+        timestep = timestep.replace(observation=extended_obs)
+        return timestep
+
+    def reset(self, params, key):
+        timestep = self._env.reset(params, key)
+        timestep = self.__extend_obs(timestep)
+        return timestep
+
+    def step(self, params, timestep, action):
+        timestep = self._env.step(params, timestep, action)
+        timestep = self.__extend_obs(timestep)
+        return timestep
