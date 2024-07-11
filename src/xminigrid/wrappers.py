@@ -76,7 +76,7 @@ class DmEnvAutoResetWrapper(Wrapper):
 # For now, faster to do this stuff with dicts instead...
 # NB: if you do not want to use this (due to the dicts as obs),
 # just get needed parts from the original TimeStep and State dataclasses
-class DirectionObsWrapper(Wrapper):
+class DirectionObservationWrapper(Wrapper):
     def observation_shape(self, params):
         base_shape = self._env.observation_shape(params)
         if isinstance(base_shape, dict):
@@ -117,7 +117,7 @@ class DirectionObsWrapper(Wrapper):
         return timestep
 
 
-class RulesAndGoalsObsWrapper(Wrapper):
+class RulesAndGoalsObservationWrapper(Wrapper):
     def observation_shape(self, params):
         base_shape = self._env.observation_shape(params)
         if isinstance(base_shape, dict):
@@ -125,15 +125,15 @@ class RulesAndGoalsObsWrapper(Wrapper):
             obs_shape = {
                 **base_shape,
                 **{
-                    "goal_encoding": params.state.goal_encoding.shape,
-                    "rule_encoding": params.state.rule_encoding.shape,
+                    "goal_encoding": params.ruleset.goal.shape,
+                    "rule_encoding": params.ruleset.rules.shape,
                 },
             }
         else:
             obs_shape = {
                 "img": self._env.observation_shape(params),
-                "goal_encoding": params.state.goal_encoding.shape,
-                "rule_encoding": params.state.rule_encoding.shape,
+                "goal_encoding": params.ruleset.goal.shape,
+                "rule_encoding": params.ruleset.rules.shape,
             }
         return obs_shape
 
