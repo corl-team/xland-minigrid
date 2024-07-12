@@ -1,0 +1,11 @@
+# params used in the paper for single-RL experiments.
+env_id: "XLand-MiniGrid-R4-13x13"
+benchmark_id: "trivial-1m"
+ruleset_id: 0
+total_timesteps: 1_000_000_000
+num_envs: 16384
+num_steps: 256
+update_epochs: 1
+num_minibatches: 8
+eval_episodes: 512
+train_seed: 5

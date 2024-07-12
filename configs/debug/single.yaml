@@ -1,0 +1,6 @@
+# params for quick debug on the CPU, should be 0.8+ score
+env_id: "MiniGrid-Empty-6x6"
+rnn_hidden_dim: 16
+head_hidden_dim: 16
+num_envs: 64
+total_timesteps: 100000
