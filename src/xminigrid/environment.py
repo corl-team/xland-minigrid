@@ -41,7 +41,7 @@ class Environment(abc.ABC, Generic[EnvParamsT, EnvCarryT]):
     def num_actions(self, params: EnvParamsT) -> int:
         return int(NUM_ACTIONS)
 
-    def observation_shape(self, params: EnvParamsT) -> tuple[int, int, int]:
+    def observation_shape(self, params: EnvParamsT) -> tuple[int, int, int] | dict[str, Any]:
         return params.view_size, params.view_size, NUM_LAYERS
 
     @abc.abstractmethod

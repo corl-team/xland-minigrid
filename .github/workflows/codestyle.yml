@@ -24,7 +24,7 @@ jobs:
           pip install -e ".[dev]"
       - name: check codestyle
         run: |
-          ruff --config pyproject.toml --diff .
+          ruff check --config pyproject.toml --diff .
       - name: check type hints
         run: |
           pyright --project=pyproject.toml src/xminigrid

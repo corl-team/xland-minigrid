@@ -11,7 +11,7 @@ repos:
 
   # pyright checking
   - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.350
+    rev: v1.1.371
     hooks:
       - id: pyright
         args: [--project=pyproject.toml]

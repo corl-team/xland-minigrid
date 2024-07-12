@@ -82,14 +82,33 @@ def _render_obs(obs: jax.Array) -> jax.Array:
 
 class RGBImgObservationWrapper(Wrapper):
     def observation_shape(self, params):
-        return params.view_size * TILE_SIZE, params.view_size * TILE_SIZE, 3
+        new_shape = (params.view_size * TILE_SIZE, params.view_size * TILE_SIZE, 3)
+
+        base_shape = self._env.observation_shape(params)
+        if isinstance(base_shape, dict):
+            assert "img" in base_shape
+            obs_shape = {**base_shape, **{"img": new_shape}}
+        else:
+            obs_shape = new_shape
+
+        return obs_shape
+
+    def __convert_obs(self, timestep):
+        if isinstance(timestep.observation, dict):
+            assert "img" in timestep.observation
+            rendered_obs = {**timestep.observation, **{"img": _render_obs(timestep.observation["img"])}}
+        else:
+            rendered_obs = _render_obs(timestep.observation)
+
+        timestep = timestep.replace(observation=rendered_obs)
+        return timestep
 
     def reset(self, params, key):
         timestep = self._env.reset(params, key)
-        timestep = timestep.replace(observation=_render_obs(timestep.observation))
+        timestep = self.__convert_obs(timestep)
         return timestep
 
     def step(self, params, timestep, action):
         timestep = self._env.step(params, timestep, action)
-        timestep = timestep.replace(observation=_render_obs(timestep.observation))
+        timestep = self.__convert_obs(timestep)
         return timestep

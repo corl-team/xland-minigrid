@@ -85,10 +85,9 @@ ignore = [
 [tool.ruff.format]
 skip-magic-trailing-comma = false
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 # see https://github.com/astral-sh/ruff/issues/8571
 known-third-party = ["wandb"]
-
 
 [tool.pyright]
 include = ["src/xminigrid"]
