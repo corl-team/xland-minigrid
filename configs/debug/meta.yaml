@@ -1,0 +1,11 @@
+# params for quick debug on the CPU, should be 0.8+ score
+env_id: "XLand-MiniGrid-R1-9x9"
+benchmark_id: "trivial-1m"
+rnn_hidden_dim: 32
+head_hidden_dim: 16
+num_envs: 256
+num_steps_per_env: 736
+num_steps_per_update: 16
+total_timesteps: 2_000_000
+eval_num_envs: 64
+eval_num_episodes: 3
