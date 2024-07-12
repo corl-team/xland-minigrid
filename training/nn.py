@@ -89,7 +89,8 @@ class MaxPool2d(nn.Module):
 
 
 class ActorCriticInput(TypedDict):
-    observation: jax.Array
+    obs_img: jax.Array
+    obs_dir: jax.Array
     prev_action: jax.Array
     prev_reward: jax.Array
 
@@ -104,7 +105,7 @@ class ActorCriticRNN(nn.Module):
 
     @nn.compact
     def __call__(self, inputs: ActorCriticInput, hidden: jax.Array) -> tuple[distrax.Categorical, jax.Array, jax.Array]:
-        B, S = inputs["observation"].shape[:2]
+        B, S = inputs["obs_img"].shape[:2]
         # encoder from https://github.com/lcswillems/rl-starter-files/blob/master/model.py
         if self.img_obs:
             img_encoder = nn.Sequential(
@@ -123,8 +124,6 @@ class ActorCriticRNN(nn.Module):
                 [
                     nn.Conv(16, (2, 2), padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
                     nn.relu,
-                    # use this only for image sizes >= 7
-                    # MaxPool2d((2, 2)),
                     nn.Conv(32, (2, 2), padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
                     nn.relu,
                     nn.Conv(64, (2, 2), padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
@@ -132,6 +131,7 @@ class ActorCriticRNN(nn.Module):
                 ]
             )
         action_encoder = nn.Embed(self.num_actions, self.action_emb_dim)
+        direction_encoder = nn.Dense(self.action_emb_dim)
 
         rnn_core = BatchedRNNModel(self.rnn_hidden_dim, self.rnn_num_layers)
         actor = nn.Sequential(
@@ -150,10 +150,13 @@ class ActorCriticRNN(nn.Module):
         )
 
         # [batch_size, seq_len, ...]
-        obs_emb = img_encoder(inputs["observation"]).reshape(B, S, -1)
+        obs_emb = img_encoder(inputs["obs_img"]).reshape(B, S, -1)
+        dir_emb = direction_encoder(inputs["obs_dir"])
         act_emb = action_encoder(inputs["prev_action"])
-        # [batch_size, seq_len, hidden_dim + act_emb_dim + 1]
-        out = jnp.concatenate([obs_emb, act_emb, inputs["prev_reward"][..., None]], axis=-1)
+
+        # [batch_size, seq_len, hidden_dim + 2 * act_emb_dim + 1]
+        out = jnp.concatenate([obs_emb, dir_emb, act_emb, inputs["prev_reward"][..., None]], axis=-1)
+
         # core networks
         out, new_hidden = rnn_core(out, hidden)
         dist = distrax.Categorical(logits=actor(out))

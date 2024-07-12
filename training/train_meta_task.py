@@ -23,7 +23,7 @@ from nn import ActorCriticRNN
 from utils import Transition, calculate_gae, ppo_update_networks, rollout
 from xminigrid.benchmarks import Benchmark
 from xminigrid.environment import Environment, EnvParams
-from xminigrid.wrappers import GymAutoResetWrapper
+from xminigrid.wrappers import DirectionObservationWrapper, GymAutoResetWrapper
 
 # this will be default in new jax versions anyway
 jax.config.update("jax_threefry_partitionable", True)
@@ -90,6 +90,7 @@ def make_states(config: TrainConfig):
 
     env, env_params = xminigrid.make(config.env_id)
     env = GymAutoResetWrapper(env)
+    env = DirectionObservationWrapper(env)
 
     # enabling image observations if needed
     if config.img_obs:
@@ -113,8 +114,11 @@ def make_states(config: TrainConfig):
         img_obs=config.img_obs,
     )
     # [batch_size, seq_len, ...]
+    shapes = env.observation_shape(env_params)
+
     init_obs = {
-        "observation": jnp.zeros((config.num_envs_per_device, 1, *env.observation_shape(env_params))),
+        "obs_img": jnp.zeros((config.num_envs_per_device, 1, *shapes["img"])),
+        "obs_dir": jnp.zeros((config.num_envs_per_device, 1, shapes["direction"])),
         "prev_action": jnp.zeros((config.num_envs_per_device, 1), dtype=jnp.int32),
         "prev_reward": jnp.zeros((config.num_envs_per_device, 1)),
     }
@@ -171,7 +175,8 @@ def make_train(
                         train_state.params,
                         {
                             # [batch_size, seq_len=1, ...]
-                            "observation": prev_timestep.observation[:, None],
+                            "obs_img": prev_timestep.observation["img"][:, None],
+                            "obs_dir": prev_timestep.observation["direction"][:, None],
                             "prev_action": prev_action[:, None],
                             "prev_reward": prev_reward[:, None],
                         },
@@ -190,7 +195,8 @@ def make_train(
                         value=value,
                         reward=timestep.reward,
                         log_prob=log_prob,
-                        obs=prev_timestep.observation,
+                        obs=prev_timestep.observation["img"],
+                        dir=prev_timestep.observation["direction"],
                         prev_action=prev_action,
                         prev_reward=prev_reward,
                     )
@@ -207,7 +213,8 @@ def make_train(
                 _, last_val, _ = train_state.apply_fn(
                     train_state.params,
                     {
-                        "observation": timestep.observation[:, None],
+                        "obs_img": timestep.observation["img"][:, None],
+                        "obs_dir": timestep.observation["direction"][:, None],
                         "prev_action": prev_action[:, None],
                         "prev_reward": prev_reward[:, None],
                     },

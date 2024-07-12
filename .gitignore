@@ -173,4 +173,7 @@ src/xminigrid/envs/xland_tmp.py
 
 # will remove later
 scripts/*testing*
+scripts/eval_example.py
 configs
+configs/debug
+config/debug
