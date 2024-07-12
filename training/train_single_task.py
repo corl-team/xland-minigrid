@@ -89,7 +89,7 @@ def make_states(config: TrainConfig):
         env = RGBImgObservationWrapper(env)
 
     # setup training state
-    rng = jax.random.PRNGKey(config.seed)
+    rng = jax.random.key(config.seed)
     rng, _rng = jax.random.split(rng)
 
     network = ActorCriticRNN(

@@ -41,7 +41,7 @@ class ManualControl:
 
         self._reset = jax.jit(self.env.reset)
         self._step = jax.jit(self.env.step)
-        self._key = jax.random.PRNGKey(0)
+        self._key = jax.random.key(0)
 
         self.timestep = None
 

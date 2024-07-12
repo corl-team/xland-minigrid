@@ -98,7 +98,7 @@ import xminigrid
 from xminigrid.wrappers import GymAutoResetWrapper
 from xminigrid.experimental.img_obs import RGBImgObservationWrapper
 
-key = jax.random.PRNGKey(0)
+key = jax.random.key(0)
 reset_key, ruleset_key = jax.random.split(key)
 
 # to list available benchmarks: xminigrid.registered_benchmarks()
@@ -196,11 +196,11 @@ benchmark: Benchmark = xminigrid.load_benchmark(name="trivial-1m")
 benchmark: Benchmark = xminigrid.load_benchmark(name="trivial-1m")
 
 # users can sample or get specific rulesets
-benchmark.sample_ruleset(jax.random.PRNGKey(0))
+benchmark.sample_ruleset(jax.random.key(0))
 benchmark.get_ruleset(ruleset_id=benchmark.num_rulesets() - 1)
 
 # or split them for train & test
-train, test = benchmark.shuffle(key=jax.random.PRNGKey(0)).split(prop=0.8)
+train, test = benchmark.shuffle(key=jax.random.key(0)).split(prop=0.8)
 ```
 
 We also provide the [script](scripts/ruleset_generator.py) used to generate these benchmarks. Users can use it for their own purposes:

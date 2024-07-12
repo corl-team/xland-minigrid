@@ -44,7 +44,7 @@ def main():
     total_reward, num_episodes = 0, 0
     rendered_imgs = []
 
-    rng = jax.random.PRNGKey(0)
+    rng = jax.random.key(0)
     rng, _rng = jax.random.split(rng)
 
     timestep = reset_fn(env_params, _rng)
