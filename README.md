@@ -37,7 +37,10 @@
 
 # Meta-Reinforcement Learning in JAX
 
-> 🥳 **XLand-MiniGrid was [accepted](https://openreview.net/forum?id=xALDC4aHGz) to [Intrinsically Motivated Open-ended Learning](https://imol-workshop.github.io) workshop at NeurIPS 2023.** We look forward to seeing everyone at the poster session! 
+[//]: # (> 🥳 **XLand-MiniGrid was [accepted]&#40;https://openreview.net/forum?id=xALDC4aHGz&#41; to [Intrinsically Motivated Open-ended Learning]&#40;https://imol-workshop.github.io&#41; workshop at NeurIPS 2023.** We look forward to seeing everyone at the poster session! )
+
+> 🥳 We recently released [**XLand-100B**](https://github.com/dunno-lab/xland-minigrid-datasets), a large multi-task dataset for offline meta and in-context RL research, based on XLand-MiniGrid. 
+It is currently the largest dataset for in-context RL, containing full learning histories for **30k unique tasks, 100B transitions, and 2.5B episodes**. Check it out!
 
 **XLand-MiniGrid** is a suite of tools, grid-world environments and benchmarks for meta-reinforcement learning research inspired by 
 the diversity and depth of [XLand](https://deepmind.google/discover/blog/generally-capable-agents-emerge-from-open-ended-play/) 
