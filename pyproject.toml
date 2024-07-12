@@ -33,8 +33,8 @@ classifiers = [
 ]
 
 dependencies = [
-    "jax>=0.4.16",
-    "jaxlib>=0.4.16",
+    "jax>=0.4.26",
+    "jaxlib>=0.4.26",
     "flax>=0.8.0",
     "rich>=13.4.2",
     "chex>=0.1.85",
