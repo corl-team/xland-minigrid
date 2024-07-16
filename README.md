@@ -266,6 +266,12 @@ Furthermore, we provide standalone implementations that can be trained in Colab:
 available. How much fun would that be 🤔? However, we hope that they will 
 help to get started quickly!
 
+## Open Logs
+
+We value openness and reproducibility in science, therefore all logs for the main experiments 
+from the paper are open and available as a [public wandb report](https://wandb.ai/state-machine/xminigrid/reports/XLand-MiniGrid-Public-Logs--Vmlldzo4NjUxMTcw).
+There you can discover all the latest plots, the behaviour of the losses, and exactly see the hyperparameters used. Enjoy!
+
 ## Contributing 🔨
 
 We welcome anyone interested in helping out! Please take a look at our [contribution guide](CONTRIBUTING.md) 
