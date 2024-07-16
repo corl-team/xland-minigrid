@@ -266,7 +266,7 @@ Furthermore, we provide standalone implementations that can be trained in Colab:
 available. How much fun would that be 🤔? However, we hope that they will 
 help to get started quickly!
 
-## Open Logs
+## Open Logs 📽
 
 We value openness and reproducibility in science, therefore all logs for the main experiments 
 from the paper are open and available as a [public wandb report](https://wandb.ai/state-machine/xminigrid/reports/XLand-MiniGrid-Public-Logs--Vmlldzo4NjUxMTcw).
@@ -287,6 +287,8 @@ and we encourage users to check them out as well.
 - [Jumanji](https://github.com/instadeepai/jumanji) - a diverse set of environments ranging from simple games to NP-hard combinatorial problems.
 - [Pgx](https://github.com/sotetsuk/pgx) - JAX implementations of classic board games, such as Chess, Go and Shogi.
 - [JaxMARL](https://github.com/flairox/jaxmarl) - multi-agent RL in JAX with wide range of commonly used environments.
+- [Craftax](https://github.com/MichaelTMatthews/Craftax) - Crafter reimplementation with JAX.
+- [Purejaxql](https://github.com/mttga/purejaxql?tab=readme-ov-file) - off-policy Q-learning baselines with JAX for single and multi-agent RL.
 
 Let's build together!
 
