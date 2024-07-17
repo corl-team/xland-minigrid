@@ -1,0 +1,14 @@
+# params used in the paper for meta-RL with RGB observations experiments. Overwrite default benchmark_id if needed.
+env_id: "XLand-MiniGrid-R1-13x13"
+benchmark_id: "high-1m"
+total_timesteps: 500_000_000
+num_envs: 1024
+num_steps_per_env: 12800
+num_steps_per_update: 128
+update_epochs: 1
+num_minibatches: 32
+eval_num_envs: 8192
+eval_num_episodes: 25
+img_obs: True
+lr: 0.0001
+train_seed: 5

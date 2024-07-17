@@ -103,7 +103,7 @@ def make_states(config: TrainConfig):
     benchmark = xminigrid.load_benchmark(config.benchmark_id)
 
     # set up training state
-    rng = jax.random.PRNGKey(config.train_seed)
+    rng = jax.random.key(config.train_seed)
     rng, _rng = jax.random.split(rng)
 
     network = ActorCriticRNN(
@@ -278,7 +278,7 @@ def make_train(
             rng, train_state = runner_state[:2]
 
             # EVALUATE AGENT
-            eval_ruleset_rng, eval_reset_rng = jax.random.split(jax.random.PRNGKey(config.eval_seed))
+            eval_ruleset_rng, eval_reset_rng = jax.random.split(jax.random.key(config.eval_seed))
             eval_ruleset_rng = jax.random.split(eval_ruleset_rng, num=config.eval_num_envs_per_device)
             eval_reset_rng = jax.random.split(eval_reset_rng, num=config.eval_num_envs_per_device)
 

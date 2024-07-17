@@ -38,7 +38,7 @@ def build_benchmark(
 
     # choose XLand benchmark if needed
     if "XLand-MiniGrid" in env_id and benchmark_id is not None:
-        ruleset = load_benchmark(benchmark_id).sample_ruleset(jax.random.PRNGKey(0))
+        ruleset = load_benchmark(benchmark_id).sample_ruleset(jax.random.key(0))
         env_params = env_params.replace(ruleset=ruleset)
 
     def benchmark_fn(key):
@@ -93,7 +93,7 @@ if __name__ == "__main__":
             benchmark_fn_pmap = jax.pmap(benchmark_fn_pmap)
 
             # benchmarking
-            pmap_keys = jax.random.split(jax.random.PRNGKey(0), num=num_devices)
+            pmap_keys = jax.random.split(jax.random.key(0), num=num_devices)
 
             elapsed_time = timeit_benchmark(args, jtu.Partial(benchmark_fn_pmap, pmap_keys))
             pmap_fps = (args.timesteps * num_envs) // elapsed_time

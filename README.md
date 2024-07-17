@@ -37,7 +37,10 @@
 
 # Meta-Reinforcement Learning in JAX
 
-> 🥳 **XLand-MiniGrid was [accepted](https://openreview.net/forum?id=xALDC4aHGz) to [Intrinsically Motivated Open-ended Learning](https://imol-workshop.github.io) workshop at NeurIPS 2023.** We look forward to seeing everyone at the poster session! 
+[//]: # (> 🥳 **XLand-MiniGrid was [accepted]&#40;https://openreview.net/forum?id=xALDC4aHGz&#41; to [Intrinsically Motivated Open-ended Learning]&#40;https://imol-workshop.github.io&#41; workshop at NeurIPS 2023.** We look forward to seeing everyone at the poster session! )
+
+> 🥳 We recently released [**XLand-100B**](https://github.com/dunno-lab/xland-minigrid-datasets), a large multi-task dataset for offline meta and in-context RL research, based on XLand-MiniGrid. 
+It is currently the largest dataset for in-context RL, containing full learning histories for **30k unique tasks, 100B transitions, and 2.5B episodes**. Check it out!
 
 **XLand-MiniGrid** is a suite of tools, grid-world environments and benchmarks for meta-reinforcement learning research inspired by 
 the diversity and depth of [XLand](https://deepmind.google/discover/blog/generally-capable-agents-emerge-from-open-ended-play/) 
@@ -95,7 +98,7 @@ import xminigrid
 from xminigrid.wrappers import GymAutoResetWrapper
 from xminigrid.experimental.img_obs import RGBImgObservationWrapper
 
-key = jax.random.PRNGKey(0)
+key = jax.random.key(0)
 reset_key, ruleset_key = jax.random.split(key)
 
 # to list available benchmarks: xminigrid.registered_benchmarks()
@@ -193,11 +196,11 @@ benchmark: Benchmark = xminigrid.load_benchmark(name="trivial-1m")
 benchmark: Benchmark = xminigrid.load_benchmark(name="trivial-1m")
 
 # users can sample or get specific rulesets
-benchmark.sample_ruleset(jax.random.PRNGKey(0))
+benchmark.sample_ruleset(jax.random.key(0))
 benchmark.get_ruleset(ruleset_id=benchmark.num_rulesets() - 1)
 
 # or split them for train & test
-train, test = benchmark.shuffle(key=jax.random.PRNGKey(0)).split(prop=0.8)
+train, test = benchmark.shuffle(key=jax.random.key(0)).split(prop=0.8)
 ```
 
 We also provide the [script](scripts/ruleset_generator.py) used to generate these benchmarks. Users can use it for their own purposes:
@@ -263,6 +266,12 @@ Furthermore, we provide standalone implementations that can be trained in Colab:
 available. How much fun would that be 🤔? However, we hope that they will 
 help to get started quickly!
 
+## Open Logs 📽
+
+We value openness and reproducibility in science, therefore all logs for the main experiments 
+from the paper are open and available as a [public wandb report](https://wandb.ai/state-machine/xminigrid/reports/XLand-MiniGrid-Public-Logs--Vmlldzo4NjUxMTcw).
+There you can discover all the latest plots, the behaviour of the losses, and exactly see the hyperparameters used. Enjoy!
+
 ## Contributing 🔨
 
 We welcome anyone interested in helping out! Please take a look at our [contribution guide](CONTRIBUTING.md) 
@@ -278,6 +287,8 @@ and we encourage users to check them out as well.
 - [Jumanji](https://github.com/instadeepai/jumanji) - a diverse set of environments ranging from simple games to NP-hard combinatorial problems.
 - [Pgx](https://github.com/sotetsuk/pgx) - JAX implementations of classic board games, such as Chess, Go and Shogi.
 - [JaxMARL](https://github.com/flairox/jaxmarl) - multi-agent RL in JAX with wide range of commonly used environments.
+- [Craftax](https://github.com/MichaelTMatthews/Craftax) - Crafter reimplementation with JAX.
+- [Purejaxql](https://github.com/mttga/purejaxql?tab=readme-ov-file) - off-policy Q-learning baselines with JAX for single and multi-agent RL.
 
 Let's build together!
 
