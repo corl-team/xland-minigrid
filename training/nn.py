@@ -9,8 +9,7 @@ import flax.linen as nn
 import jax
 import jax.numpy as jnp
 from flax.linen.initializers import glorot_normal, orthogonal, zeros_init
-
-# from xminigrid.core.constants import NUM_COLORS, NUM_TILES
+from xminigrid.core.constants import NUM_COLORS, NUM_TILES
 
 
 class GRU(nn.Module):
@@ -63,29 +62,23 @@ BatchedRNNModel = flax.linen.vmap(
 )
 
 
-class MaxPool2d(nn.Module):
-    kernel_size: tuple[int, int]
+class EmbeddingEncoder(nn.Module):
+    emb_dim: int = 16
 
     @nn.compact
-    def __call__(self, x):
-        return nn.max_pool(inputs=x, window_shape=self.kernel_size, strides=self.kernel_size, padding="VALID")
+    def __call__(self, img):
+        entity_emb = nn.Embed(NUM_TILES, self.emb_dim)
+        color_emb = nn.Embed(NUM_COLORS, self.emb_dim)
 
-
-# not used currently
-# class EmbeddingEncoder(nn.Module):
-#     emb_dim: int = 2
-#
-#     @nn.compact
-#     def __call__(self, img):
-#         entity_emb = nn.Embed(NUM_TILES, self.emb_dim)
-#         color_emb = nn.Embed(NUM_COLORS, self.emb_dim)
-#
-#         # [..., channels]
-#         img_emb = jnp.concatenate([
-#             entity_emb(img[..., 0]),
-#             color_emb(img[..., 1]),
-#         ], axis=-1)
-#         return img_emb
+        # [..., channels]
+        img_emb = jnp.concatenate(
+            [
+                entity_emb(img[..., 0]),
+                color_emb(img[..., 1]),
+            ],
+            axis=-1,
+        )
+        return img_emb
 
 
 class ActorCriticInput(TypedDict):
@@ -97,6 +90,7 @@ class ActorCriticInput(TypedDict):
 
 class ActorCriticRNN(nn.Module):
     num_actions: int
+    obs_emb_dim: int = 16
     action_emb_dim: int = 16
     rnn_hidden_dim: int = 64
     rnn_num_layers: int = 1
@@ -106,6 +100,7 @@ class ActorCriticRNN(nn.Module):
     @nn.compact
     def __call__(self, inputs: ActorCriticInput, hidden: jax.Array) -> tuple[distrax.Categorical, jax.Array, jax.Array]:
         B, S = inputs["obs_img"].shape[:2]
+
         # encoder from https://github.com/lcswillems/rl-starter-files/blob/master/model.py
         if self.img_obs:
             img_encoder = nn.Sequential(
@@ -122,6 +117,7 @@ class ActorCriticRNN(nn.Module):
         else:
             img_encoder = nn.Sequential(
                 [
+                    EmbeddingEncoder(emb_dim=self.obs_emb_dim),
                     nn.Conv(16, (2, 2), padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
                     nn.relu,
                     nn.Conv(32, (2, 2), padding="VALID", kernel_init=orthogonal(math.sqrt(2))),
@@ -150,7 +146,7 @@ class ActorCriticRNN(nn.Module):
         )
 
         # [batch_size, seq_len, ...]
-        obs_emb = img_encoder(inputs["obs_img"]).reshape(B, S, -1)
+        obs_emb = img_encoder(inputs["obs_img"].astype(jnp.int32)).reshape(B, S, -1)
         dir_emb = direction_encoder(inputs["obs_dir"])
         act_emb = action_encoder(inputs["prev_action"])
 

@@ -34,6 +34,7 @@ class TrainConfig:
     ruleset_id: Optional[int] = None
     img_obs: bool = False
     # agent
+    obs_emb_dim: int = 16
     action_emb_dim: int = 16
     rnn_hidden_dim: int = 1024
     rnn_num_layers: int = 1
@@ -95,6 +96,7 @@ def make_states(config: TrainConfig):
 
     network = ActorCriticRNN(
         num_actions=env.num_actions(env_params),
+        obs_emb_dim=config.obs_emb_dim,
         action_emb_dim=config.action_emb_dim,
         rnn_hidden_dim=config.rnn_hidden_dim,
         rnn_num_layers=config.rnn_num_layers,
