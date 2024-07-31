@@ -44,6 +44,7 @@ class TrainConfig:
     rnn_num_layers: int = 1
     head_hidden_dim: int = 256
     # training
+    enable_bf16: bool = False
     num_envs: int = 8192
     num_steps_per_env: int = 4096
     num_steps_per_update: int = 32
@@ -114,6 +115,7 @@ def make_states(config: TrainConfig):
         rnn_num_layers=config.rnn_num_layers,
         head_hidden_dim=config.head_hidden_dim,
         img_obs=config.img_obs,
+        dtype=jnp.bfloat16 if config.enable_bf16 else None,
     )
     # [batch_size, seq_len, ...]
     shapes = env.observation_shape(env_params)
@@ -148,6 +150,8 @@ def make_train(
         train_state: TrainState,
         init_hstate: jax.Array,
     ):
+        eval_hstate = init_hstate[0][None]
+
         # META TRAIN LOOP
         def _meta_step(meta_state, _):
             rng, train_state = meta_state
@@ -290,8 +294,7 @@ def make_train(
                 env,
                 eval_env_params,
                 train_state,
-                # TODO: make this a static method?
-                jnp.zeros((1, config.rnn_num_layers, config.rnn_hidden_dim)),
+                eval_hstate,
                 config.eval_num_episodes,
             )
             eval_stats = jax.lax.pmean(eval_stats, axis_name="devices")

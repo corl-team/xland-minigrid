@@ -40,6 +40,7 @@ class TrainConfig:
     rnn_num_layers: int = 1
     head_hidden_dim: int = 256
     # training
+    enable_bf16: bool = False
     num_envs: int = 8192
     num_steps: int = 16
     update_epochs: int = 1
@@ -102,6 +103,7 @@ def make_states(config: TrainConfig):
         rnn_num_layers=config.rnn_num_layers,
         head_hidden_dim=config.head_hidden_dim,
         img_obs=config.img_obs,
+        dtype=jnp.bfloat16 if config.enable_bf16 else None,
     )
 
     # [batch_size, seq_len, ...]
