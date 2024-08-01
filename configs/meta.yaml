@@ -6,7 +6,7 @@ num_envs: 16384
 num_steps_per_env: 12800
 num_steps_per_update: 256
 update_epochs: 1
-num_minibatches: 32
+num_minibatches: 16
 eval_num_envs: 16384
 eval_num_episodes: 25
 train_seed: 5

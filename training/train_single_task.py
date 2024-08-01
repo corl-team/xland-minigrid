@@ -18,7 +18,7 @@ from flax.training.train_state import TrainState
 from nn import ActorCriticRNN
 from utils import Transition, calculate_gae, ppo_update_networks, rollout
 from xminigrid.environment import Environment, EnvParams
-from xminigrid.wrappers import GymAutoResetWrapper
+from xminigrid.wrappers import DirectionObservationWrapper, GymAutoResetWrapper
 
 # this will be default in new jax versions anyway
 jax.config.update("jax_threefry_partitionable", True)
@@ -34,11 +34,13 @@ class TrainConfig:
     ruleset_id: Optional[int] = None
     img_obs: bool = False
     # agent
+    obs_emb_dim: int = 16
     action_emb_dim: int = 16
     rnn_hidden_dim: int = 1024
     rnn_num_layers: int = 1
     head_hidden_dim: int = 256
     # training
+    enable_bf16: bool = False
     num_envs: int = 8192
     num_steps: int = 16
     update_epochs: int = 1
@@ -74,6 +76,7 @@ def make_states(config: TrainConfig):
     # setup environment
     env, env_params = xminigrid.make(config.env_id)
     env = GymAutoResetWrapper(env)
+    env = DirectionObservationWrapper(env)
 
     # for single-task XLand environments
     if config.benchmark_id is not None:
@@ -94,15 +97,21 @@ def make_states(config: TrainConfig):
 
     network = ActorCriticRNN(
         num_actions=env.num_actions(env_params),
+        obs_emb_dim=config.obs_emb_dim,
         action_emb_dim=config.action_emb_dim,
         rnn_hidden_dim=config.rnn_hidden_dim,
         rnn_num_layers=config.rnn_num_layers,
         head_hidden_dim=config.head_hidden_dim,
         img_obs=config.img_obs,
+        dtype=jnp.bfloat16 if config.enable_bf16 else None,
     )
+
     # [batch_size, seq_len, ...]
+    shapes = env.observation_shape(env_params)
+
     init_obs = {
-        "observation": jnp.zeros((config.num_envs_per_device, 1, *env.observation_shape(env_params))),
+        "obs_img": jnp.zeros((config.num_envs_per_device, 1, *shapes["img"])),
+        "obs_dir": jnp.zeros((config.num_envs_per_device, 1, shapes["direction"])),
         "prev_action": jnp.zeros((config.num_envs_per_device, 1), dtype=jnp.int32),
         "prev_reward": jnp.zeros((config.num_envs_per_device, 1)),
     }
@@ -149,7 +158,8 @@ def make_train(
                     train_state.params,
                     {
                         # [batch_size, seq_len=1, ...]
-                        "observation": prev_timestep.observation[:, None],
+                        "obs_img": prev_timestep.observation["img"][:, None],
+                        "obs_dir": prev_timestep.observation["direction"][:, None],
                         "prev_action": prev_action[:, None],
                         "prev_reward": prev_reward[:, None],
                     },
@@ -167,7 +177,8 @@ def make_train(
                     value=value,
                     reward=timestep.reward,
                     log_prob=log_prob,
-                    obs=prev_timestep.observation,
+                    obs=prev_timestep.observation["img"],
+                    dir=prev_timestep.observation["direction"],
                     prev_action=prev_action,
                     prev_reward=prev_reward,
                 )
@@ -184,7 +195,8 @@ def make_train(
             _, last_val, _ = train_state.apply_fn(
                 train_state.params,
                 {
-                    "observation": timestep.observation[:, None],
+                    "obs_img": timestep.observation["img"][:, None],
+                    "obs_dir": timestep.observation["direction"][:, None],
                     "prev_action": prev_action[:, None],
                     "prev_reward": prev_reward[:, None],
                 },

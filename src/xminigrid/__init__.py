@@ -2,11 +2,11 @@ from .benchmarks import load_benchmark, registered_benchmarks
 from .registration import make, register, registered_environments
 
 # TODO: add __all__
-__version__ = "0.8.0"
+__version__ = "0.9.0"
 
 # ---------- XLand-MiniGrid environments ----------
 
-# WARN: TMP, only for FPS measurements
+# WARN: TMP, only for FPS measurements, will remove later
 # register(
 #     id="MiniGrid-1Rules",
 #     entry_point="xminigrid.envs.xland_tmp:XLandMiniGrid",
@@ -79,9 +79,6 @@ __version__ = "0.8.0"
 #     width=64,
 # )
 
-
-# TODO: reconsider grid sizes and time limits after the benchmarks are generated.
-#  Should be enough space for initial tiles even in the hardest setting
 register(
     id="XLand-MiniGrid-R1-9x9",
     entry_point="xminigrid.envs.xland:XLandMiniGrid",

@@ -6,6 +6,6 @@ total_timesteps: 1_000_000_000
 num_envs: 16384
 num_steps: 256
 update_epochs: 1
-num_minibatches: 8
+num_minibatches: 16
 eval_episodes: 512
 train_seed: 5
