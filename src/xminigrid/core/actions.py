@@ -20,8 +20,8 @@ def _move(position: jax.Array, direction: jax.Array) -> jax.Array:
 def move_forward(grid: GridState, agent: AgentState) -> ActionOutput:
     next_position = jnp.clip(
         _move(agent.position, agent.direction),
-        a_min=jnp.array((0, 0)),
-        a_max=jnp.array((grid.shape[0] - 1, grid.shape[1] - 1)),  # H, W
+        min=jnp.array((0, 0)),
+        max=jnp.array((grid.shape[0] - 1, grid.shape[1] - 1)),  # H, W
     )
     position = jax.lax.select(
         check_walkable(grid, next_position),
