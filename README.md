@@ -132,7 +132,7 @@ For a bit more advanced introduction see provided [walkthrough notebook](example
 
 ### On environment interface
 
-Currently, there are a lot of new JAX-based environments appearing, each offering its own variant of API. Initially, we tried to reuse Jumaji, but it turned out 
+Currently, there are a lot of new JAX-based environments appearing, each offering its own variant of API. Initially, we tried to reuse Jumanji, but it turned out 
 that its design [is not suitable for meta learning](https://github.com/instadeepai/jumanji/issues/212). The Gymnax design appeared to be more appropriate, but unfortunately it is not actively supported and
 often departs from the idea that parameters should only be contained in `env_params`. Furthermore, splitting 
 `timestep` into multiple entities seems suboptimal to us, as it complicates many things, such as envpool or dm_env 
