@@ -11,6 +11,7 @@ import jax.numpy as jnp
 from flax.linen.dtypes import promote_dtype
 from flax.linen.initializers import glorot_normal, orthogonal, zeros_init
 from flax.typing import Dtype
+
 from xminigrid.core.constants import NUM_COLORS, NUM_TILES
 
 

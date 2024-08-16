@@ -1,7 +1,7 @@
 repos:
   # ruff checking
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.4
+    rev: v0.6.0
     hooks:
       # Run the linter.
       - id: ruff
@@ -11,7 +11,7 @@ repos:
 
   # pyright checking
   - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.371
+    rev: v1.1.376
     hooks:
       - id: pyright
         args: [--project=pyproject.toml]
