@@ -70,6 +70,7 @@ version = {attr = "xminigrid.__version__"}
 [tool.ruff]
 line-length = 120
 target-version = "py310"
+exclude = ["examples/*.ipynb"]
 
 [tool.ruff.lint]
 # disabling rules conflicting with the formatter (from the docs)
