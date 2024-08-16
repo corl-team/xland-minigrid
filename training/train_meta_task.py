@@ -15,12 +15,13 @@ import optax
 import orbax
 import pyrallis
 import wandb
-import xminigrid
 from flax.jax_utils import replicate, unreplicate
 from flax.training import orbax_utils
 from flax.training.train_state import TrainState
 from nn import ActorCriticRNN
 from utils import Transition, calculate_gae, ppo_update_networks, rollout
+
+import xminigrid
 from xminigrid.benchmarks import Benchmark
 from xminigrid.environment import Environment, EnvParams
 from xminigrid.wrappers import DirectionObservationWrapper, GymAutoResetWrapper

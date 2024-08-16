@@ -7,8 +7,9 @@ from typing import Optional
 import jax
 import jax.tree_util as jtu
 import numpy as np
-import xminigrid
 from tqdm.auto import tqdm
+
+import xminigrid
 from xminigrid import load_benchmark
 from xminigrid.wrappers import GymAutoResetWrapper
 

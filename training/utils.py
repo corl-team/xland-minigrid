@@ -3,6 +3,7 @@ import jax
 import jax.numpy as jnp
 from flax import struct
 from flax.training.train_state import TrainState
+
 from xminigrid.environment import Environment, EnvParams
 
 
