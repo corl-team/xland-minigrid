@@ -12,11 +12,12 @@ import jax.tree_util as jtu
 import optax
 import pyrallis
 import wandb
-import xminigrid
 from flax.jax_utils import replicate, unreplicate
 from flax.training.train_state import TrainState
 from nn import ActorCriticRNN
 from utils import Transition, calculate_gae, ppo_update_networks, rollout
+
+import xminigrid
 from xminigrid.environment import Environment, EnvParams
 from xminigrid.wrappers import DirectionObservationWrapper, GymAutoResetWrapper
 

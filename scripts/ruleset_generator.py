@@ -8,6 +8,7 @@ from itertools import product
 
 import jax.numpy as jnp
 from tqdm.auto import tqdm, trange
+
 from xminigrid.benchmarks import save_bz2_pickle
 from xminigrid.core.constants import Colors, Tiles
 from xminigrid.core.goals import (
