@@ -237,7 +237,7 @@ def render(
     height_px = grid.shape[0] * int(tile_size)
     width_px = grid.shape[1] * int(tile_size)
 
-    img = np.full((height_px, width_px, 3), dtype=np.uint8, fill_value=-1)
+    img = np.full((height_px, width_px, 3), dtype=np.uint8, fill_value=255)
 
     # compute agent fov highlighting
     highlight_mask = get_highlight_mask(grid, agent, int(view_size))
