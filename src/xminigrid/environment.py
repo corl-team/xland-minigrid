@@ -26,7 +26,7 @@ class EnvParams(struct.PyTreeNode):
     height: int = struct.field(pytree_node=False, default=9)
     width: int = struct.field(pytree_node=False, default=9)
     view_size: int = struct.field(pytree_node=False, default=7)
-    max_steps: Optional[None] = struct.field(pytree_node=False, default=None)
+    max_steps: Optional[int] = struct.field(pytree_node=False, default=None)
     render_mode: str = struct.field(pytree_node=False, default="rgb_array")
 
 
